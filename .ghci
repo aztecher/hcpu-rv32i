@@ -1,0 +1,20 @@
+:set -XDataKinds
+:set -XDeriveGeneric
+:set -XDeriveAnyClass
+:set -XKindSignatures
+:set -XFlexibleContexts
+:set -XRankNTypes
+:set -XQuantifiedConstraints
+:set -XMonoLocalBinds
+:set -XScopedTypeVariables
+:set -XMagicHash
+:m + Clash.Sized.BitVector
+:m + Clash.Sized.Unsigned
+:m + Clash.Class.BitPack
+:m + Clash.Sized.Internal.BitVector
+:m + Clash.Prelude
+:m + Clash.Promoted.Nat.Literals
+:m + Control.Monad
+
+:set prompt "λ > "
+
