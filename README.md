@@ -18,7 +18,7 @@ Haskell + Clash で RISC-V 準拠のCPUを作成してみたい。
 	* [ ] R-type Format
 		* [x] ADD
 	* [ ] I-type Format
-		* [ ] ADDI
+		* [x] ADDI
 	* [ ] S-type Format
 	* [ ] B-type Format
 	* [ ] U-type Format
