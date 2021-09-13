@@ -26,6 +26,9 @@ dependencies:
 - ghc-typelits-knownnat
 - clash-prelude
 - deepseq
+- hspec
+- HUnit
+- QuickCheck >= 2.14.2
 
 default-extensions:
 - DataKinds

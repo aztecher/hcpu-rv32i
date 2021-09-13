@@ -40,8 +40,14 @@ packages:
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
 extra-deps:
-  - clash-prelude-1.0.1-GtMahJy6V0IGNbSWkFmB8l
-
+  - clash-prelude-1.2.5@sha256:2ea4d0506adfccd0e817a67e47de132290a856535dd69bcc71e7fbce24ece3f2,15307
+  - ghc-typelits-extra-0.4.2@sha256:cc986554a4483e92795589dc02aa1e0bd41daf89b962c56c2a48ff2f66e88aeb,4887
+  - ghc-typelits-knownnat-0.7.5@sha256:7d4c315c51ac2e1d5ab92634b87448de7d08f91dd06535f957344b386b49087f,4820
+  - ghc-typelits-natnormalise-0.7.4@sha256:e690d4bb22259c8ca56513bdd381b493791ca6565fd4e75b8107ba128e7324c0,3516
+  # - clash-prelude-1.0.1
+  - QuickCheck-2.14.2@sha256:4ce29211223d5e6620ebceba34a3ca9ccf1c10c0cf387d48aea45599222ee5aa,7736
+  - random-1.2.0@sha256:30d72df4cc1d2fe2d445c88f0ee9d21965af7ce86660c43a6c32a6a1d90d51c9,6094
+  - splitmix-0.1.0.3@sha256:fc3aae74c467f4b608050bef53aec17904a618731df9407e655d8f3bf8c32d5c,6049
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

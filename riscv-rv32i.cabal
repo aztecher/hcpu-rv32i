@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6d163e5ac7b0196ea6b6a3a0b8bf1832d726a0c07b930b8de7bb4679e6c268c3
+-- hash: 79a35efc86caa32705bdf00b67087acde1257ce93f4e0453b05dac4d1f5f2c53
 
 name:           riscv-rv32i
 version:        0.1.0.0
@@ -27,19 +27,33 @@ source-repository head
 
 library
   exposed-modules:
-      RV32I
+      RV32I.Programs.Fib
+      RV32I.RV32I
   other-modules:
       Paths_riscv_rv32i
   hs-source-dirs:
       src
-  default-extensions: DataKinds DeriveGeneric DeriveAnyClass KindSignatures FlexibleContexts RankNTypes QuantifiedConstraints ScopedTypeVariables MonoLocalBinds MagicHash
+  default-extensions:
+      DataKinds
+      DeriveGeneric
+      DeriveAnyClass
+      KindSignatures
+      FlexibleContexts
+      RankNTypes
+      QuantifiedConstraints
+      ScopedTypeVariables
+      MonoLocalBinds
+      MagicHash
   build-depends:
-      base >=4.7 && <5
+      HUnit
+    , QuickCheck >=2.14.2
+    , base >=4.7 && <5
     , clash-prelude
     , deepseq
     , ghc-typelits-extra
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
+    , hspec
   default-language: Haskell2010
 
 executable riscv-rv32i-exe
@@ -48,15 +62,28 @@ executable riscv-rv32i-exe
       Paths_riscv_rv32i
   hs-source-dirs:
       app
-  default-extensions: DataKinds DeriveGeneric DeriveAnyClass KindSignatures FlexibleContexts RankNTypes QuantifiedConstraints ScopedTypeVariables MonoLocalBinds MagicHash
+  default-extensions:
+      DataKinds
+      DeriveGeneric
+      DeriveAnyClass
+      KindSignatures
+      FlexibleContexts
+      RankNTypes
+      QuantifiedConstraints
+      ScopedTypeVariables
+      MonoLocalBinds
+      MagicHash
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HUnit
+    , QuickCheck >=2.14.2
+    , base >=4.7 && <5
     , clash-prelude
     , deepseq
     , ghc-typelits-extra
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
+    , hspec
     , riscv-rv32i
   default-language: Haskell2010
 
@@ -64,17 +91,31 @@ test-suite riscv-rv32i-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      RV32I.RV32ISpec
       Paths_riscv_rv32i
   hs-source-dirs:
       test
-  default-extensions: DataKinds DeriveGeneric DeriveAnyClass KindSignatures FlexibleContexts RankNTypes QuantifiedConstraints ScopedTypeVariables MonoLocalBinds MagicHash
+  default-extensions:
+      DataKinds
+      DeriveGeneric
+      DeriveAnyClass
+      KindSignatures
+      FlexibleContexts
+      RankNTypes
+      QuantifiedConstraints
+      ScopedTypeVariables
+      MonoLocalBinds
+      MagicHash
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HUnit
+    , QuickCheck >=2.14.2
+    , base >=4.7 && <5
     , clash-prelude
     , deepseq
     , ghc-typelits-extra
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
+    , hspec
     , riscv-rv32i
   default-language: Haskell2010
