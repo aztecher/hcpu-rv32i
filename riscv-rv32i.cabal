@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 79a35efc86caa32705bdf00b67087acde1257ce93f4e0453b05dac4d1f5f2c53
+-- hash: db1b50dc78c0f39a1416b8bd7eebb8e3124fd8e9959b524dd1ef39fc0d6c246b
 
 name:           riscv-rv32i
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      RV32I.Programs.Example
       RV32I.Programs.Fib
       RV32I.RV32I
   other-modules:
@@ -44,6 +45,8 @@ library
       ScopedTypeVariables
       MonoLocalBinds
       MagicHash
+      TypeOperators
+      TypeFamilies
   build-depends:
       HUnit
     , QuickCheck >=2.14.2
@@ -54,6 +57,7 @@ library
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
     , hspec
+    , pretty-simple
   default-language: Haskell2010
 
 executable riscv-rv32i-exe
@@ -73,6 +77,8 @@ executable riscv-rv32i-exe
       ScopedTypeVariables
       MonoLocalBinds
       MagicHash
+      TypeOperators
+      TypeFamilies
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit
@@ -84,6 +90,7 @@ executable riscv-rv32i-exe
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
     , hspec
+    , pretty-simple
     , riscv-rv32i
   default-language: Haskell2010
 
@@ -91,7 +98,10 @@ test-suite riscv-rv32i-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      RV32I.Programs.ExampleSpec
       RV32I.RV32ISpec
+      TestUtils.Common
+      TestUtils.Program
       Paths_riscv_rv32i
   hs-source-dirs:
       test
@@ -106,6 +116,8 @@ test-suite riscv-rv32i-test
       ScopedTypeVariables
       MonoLocalBinds
       MagicHash
+      TypeOperators
+      TypeFamilies
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit
@@ -117,5 +129,6 @@ test-suite riscv-rv32i-test
     , ghc-typelits-knownnat
     , ghc-typelits-natnormalise
     , hspec
+    , pretty-simple
     , riscv-rv32i
   default-language: Haskell2010

@@ -29,6 +29,7 @@ dependencies:
 - hspec
 - HUnit
 - QuickCheck >= 2.14.2
+- pretty-simple
 
 default-extensions:
 - DataKinds
@@ -41,6 +42,8 @@ default-extensions:
 - ScopedTypeVariables
 - MonoLocalBinds
 - MagicHash
+- TypeOperators
+- TypeFamilies
 
 library:
   source-dirs: src
