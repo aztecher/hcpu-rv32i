@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: db1b50dc78c0f39a1416b8bd7eebb8e3124fd8e9959b524dd1ef39fc0d6c246b
+-- hash: 98e9151db8c290c750e99d37fb4ea1d449b2be10ede76ac8d9053cb4fc079a34
 
 name:           riscv-rv32i
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      RV32I.DSL
       RV32I.Programs.Example
       RV32I.Programs.Fib
       RV32I.RV32I
@@ -98,6 +99,7 @@ test-suite riscv-rv32i-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      RV32I.DSLSpec
       RV32I.Programs.ExampleSpec
       RV32I.RV32ISpec
       TestUtils.Common

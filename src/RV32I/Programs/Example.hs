@@ -80,7 +80,7 @@ orDiff =
     :> J (JJal JAL (Word20 3) S4)
     :> Nil
 
--- Test ADDI/XOR
+-- Test ADDI/XORI
 -- 0001(1) XOR 0001(1) = 0000(0)
 xorImm :: Vec 3 Instruction
 xorImm =
@@ -90,7 +90,7 @@ xorImm =
     :> J (JJal JAL (Word20 2) S3)
     :> Nil
 
--- Test ADDI/XORI
+-- Test ADDI/XOR
 -- 0011(3) OR 0101(5) = 0110(6)
 xorDiff :: Vec 4 Instruction
 xorDiff =
@@ -285,9 +285,6 @@ sltuDiffGt =
     -- pesudo stop
     :> J (JJal JAL (Word20 3) S4)
     :> Nil
-
--- Test JALR
-
 
 -- Test SB/LB
 sblb =
