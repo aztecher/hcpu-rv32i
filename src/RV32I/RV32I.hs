@@ -28,21 +28,6 @@ import Prelude ((+), (-), ($), (==), (>=), (<),
   Show, Eq, Enum, IO, Int, Functor, Integer, Bool(..), Maybe(..))
 import Data.Function (fix)
 
--- 参考文献
--- RISC-Vの原点
--- https://inst.eecs.berkeley.edu/~cs61c/resources/su18_lec/Lecture7.pdf
-
--- Word
--- TODO: Signedも取りうる気がする
--- newtype Word32 = Word32 (Unsigned 32) deriving (Show, Generic, NFDataX)
--- newtype Word20 = Word20 (Unsigned 20) deriving (Show, Generic, NFDataX)
--- newtype Word16 = Word16 (Unsigned 16) deriving (Show, Generic, NFDataX)
--- newtype Word12 = Word12 (Unsigned 12) deriving (Show, Generic, NFDataX)
--- newtype Word8  = Word8  (Unsigned  8) deriving (Show, Generic, NFDataX)
--- newtype Word7  = Word7  (Unsigned  7) deriving (Show, Generic, NFDataX)
--- newtype Word5  = Word5  (Unsigned  5) deriving (Show, Generic, NFDataX)
--- newtype Word4  = Word4  (Unsigned  4) deriving (Show, Generic, NFDataX)
-
 -- WordX is represents X bit that will intepreted as unsined.
 newtype Word32 = Word32 (Signed 32) deriving (Show, Eq, Generic, NFDataX)
 newtype Word20 = Word20 (Signed 20) deriving (Show, Eq, Generic, NFDataX)
@@ -55,52 +40,7 @@ newtype Word4  = Word4  (Signed  4) deriving (Show, Eq, Generic, NFDataX)
 
 
 -- RAM
-
 data RAM = RAM (Vec 1000 Word32) deriving (Show, Generic, NFDataX)
--- data RAM = RAM (Vec 32 Word32) deriving (Show, Generic, NFDataX)
--- data RAM = RAM (Vec 3 Word32) deriving (Show, Generic, NFDataX)
-
--- Program ... Vector Instruction
---  -(encode)-> Vector Word32
---  -(load)-> RAM (Vector Word32)
---
-
--- Register
--- data Register
---   = X0
---   | X1
---   | X2
---   | X3
---   | X4
---   | X5
---   | X6
---   | X7
---   | X8
---   | X9
---   | X10
---   | X11
---   | X12
---   | X13
---   | X14
---   | X15
---   | X16
---   | X17
---   | X18
---   | X19
---   | X20
---   | X21
---   | X22
---   | X23
---   | X24
---   | X25
---   | X26
---   | X27
---   | X28
---   | X29
---   | X30
---   | X31
---   deriving (Show, Generic, NFDataX)
-
 
 data Register
   = Zero -- constant value : 0
@@ -141,7 +81,6 @@ data Register
 -- [ R | I | S | B | U | J ](Opcode name for distinguishing format)
 
 -- R Opcode
-
 data RArith
   = ADD
   | SUB
@@ -156,7 +95,6 @@ data RArith
   deriving (Show, Generic, NFDataX, Eq, Enum)
 
 -- I Opcode
-
 data IArith
   = ADDI
   | SLTI
@@ -204,7 +142,6 @@ data ICsri
   deriving (Show, Generic, NFDataX, Eq, Enum)
 
 -- S Opcode
-
 data SStore
   = SB
   | SH
@@ -230,9 +167,6 @@ data UArith
 -- J Opcode
 data JJal = JAL deriving (Show, Generic, NFDataX, Eq, Enum)
 
-
--- Format
--- TODO(mmichish) : you can modify definition for implementation
 
 -- R Format
 data RFormat
@@ -637,32 +571,8 @@ decodeInstruction word@(Word32 val) = case op of
         offset = slice Nat.d31 Nat.d12 val
         rd     = decodeRegister $ slice Nat.d11 Nat.d7  val
 
--- RAM / CPU
 
--- -- TODO(mmichish): want this
--- 1. write program
--- program :: Vec N Instruction
--- program = Instruction XX XX :>
---           Instruction XX XX :>
---           ......
-
--- 2. load program in CPU and prepair to execute
--- programCPU :: cpuHardware defaultCPUStatus (RAM program)
---
--- cpuHardware :: CPUState -> RAM -> Signal dom Result
--- defaultCPUStatus :: CPUState
---
--- cpuHardware calls cycle function
---
--- cycle :: (CPUState, RAM) -> (CPUState, RAM)
--- CPUState ... XXXInstruction
--- RAM ... Data
-
-
--- newtype Ptr = Ptr (Unsigned 32) deriving (Show, Generic, NFDataX)
 newtype Ptr = Ptr (Signed 32) deriving (Show, Eq, Generic, NFDataX)
-
--- newtype Output = Output (Unsigned 32) deriving (Show, Generic, NFDataX)
 newtype Output = Output (Signed 32) deriving (Show, Eq, Generic, NFDataX)
 
 readRAM :: RAM -> Ptr -> Word32
@@ -706,11 +616,9 @@ writeRAM1Byte (RAM contents) (Ptr address) (Word8 val) = value
 increment :: Ptr -> Ptr
 increment (Ptr address) = Ptr (address + 1)
 
--- addptr :: Ptr -> Unsigned 32 -> Ptr
 addptr :: Ptr -> Signed 32 -> Ptr
 addptr (Ptr address) offset = Ptr (address + offset)
 
--- readRegister :: Registers -> Register -> Unsigned 32
 readRegister :: Registers -> Register -> Signed 32
 readRegister (Registers x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20 x21 x22 x23 x24 x25 x26 x27 x28 x29 x30 x31 _) reg = case reg of
   Zero -> x0
@@ -812,17 +720,15 @@ decodeImmBFormat (Word7 offset1, Word5 offset2) = unpack offset
     offset = resize offset_bitvector
 
 
--- -- TODO(mmichish): CPU State and RAM
+-- CPU State
 data CPUActivity
   = LoadingInstruction
   | ExecutingInstruction Instruction deriving (Show, Generic, NFDataX)
   -- -- | Halted
 
-
 data CPUState = CPUState CPUActivity Registers deriving (Show, Generic, NFDataX)
 
 
--- cycle :: (CPUState, RAM) -> (CPUState, RAM)
 cycle :: HasCallStack => (CPUState, RAM) -> (CPUState, RAM)
 cycle (CPUState activity registers, ram) = case activity of
   LoadingInstruction -> (CPUState activity' registers', ram)
@@ -965,6 +871,7 @@ cycle (CPUState activity registers, ram) = case activity of
       IJalr jalr (Word12 offset) rs1 rd -> case jalr of
         JALR -> (CPUState LoadingInstruction registers'', ram)
           where
+            -- TODO: mismatch of Address space and Vec n Instruction
             Ptr before = pc registers
             registers' = writeRegister registers rd (before + (1 :: Signed 32))
             pc' = Ptr $ unpack $
@@ -973,14 +880,6 @@ cycle (CPUState activity registers, ram) = case activity of
                 0
                 0
             registers'' = registers' { pc = pc' }
-
-            -- Ptr address = pc registers
-            -- -- t = address + (4 :: Signed 32) -- TODO: Address space as Word32
-            -- t = address + (1 :: Signed 32)    -- TODO: Address space as 'n' of Vec n Word32
-            -- pc' = readRegister registers rs1 + resize offset
-            -- -- bitmask pc' & ~1 ??
-            -- -- registers' = registers {pc = pc''}
-            -- registers' = writeRegister registers' rd t
       ILoad load (Word12 offset) rs1 rd -> case load of
         LB  -> (CPUState LoadingInstruction registers', ram)
           where
@@ -1047,10 +946,8 @@ cycle (CPUState activity registers, ram) = case activity of
             ram'   = writeRAM2Byte ram ptr value
         SW -> (CPUState LoadingInstruction registers, ram')
           where
-            -- implement
             offset = unpack $ pack offset1 ++# pack offset2
             ptr    = Ptr $ readRegister registers rs1 + resize offset
-            -- value  = Word32 $ resize $ readRegister registers rs2
             value  = Word32 $ readRegister registers rs2
             ram'   = writeRAM4Byte ram ptr value
     B format -> case format of
@@ -1111,9 +1008,6 @@ cycle (CPUState activity registers, ram) = case activity of
             pc'' = case urs1 < urs2 of
               True -> pc'
               False -> addptr pc' (resize offset)
-            -- pc''   = case readRegister registers rs1 >= readRegister registers rs2 of
-            --   True  -> addptr pc' (resize offset)
-            --   False -> pc'
             registers' = registers {pc = pc''}
       where
         bformat_offset :: Signed 7 -> Signed 5 -> BitVector 13
@@ -1145,19 +1039,12 @@ cycle (CPUState activity registers, ram) = case activity of
       JJal jal (Word20 offset) rd -> case jal of
         JAL -> (CPUState LoadingInstruction registers'', ram)
           where
-            -- TODO: 実装が少しおかしいoffset加えるとかそういうところ
-            --       https://qiita.com/zacky1972/items/48bf61bfe3ef2b8ce557
-            --       Symbol valueの場合はpcにその値を設定するとのこと。どう違うのか?
-            --
-            -- TODO: Adress space as Word32 -> (addr + 4)
-            -- TODO: Address space as 'n' of Vec 'n' Word32 -> (addr + 1)
+            -- TODO: mismatch of Address space and Vec n Instruction
             Ptr addr = pc registers
             -- registers' = writeRegister registers rd (addr + (4 :: Signed 32))
             registers' = writeRegister registers rd (addr + (1 :: Signed 32))
             pc' = Ptr (resize offset)
             registers'' = registers' { pc = pc' }
-  -- Outputting _ -> undefined
-  -- Halted -> (CPUState Halted registers, ram)
   where
     loadedWord = readRAM ram (pc registers)
     activity'  = ExecutingInstruction (decodeInstruction loadedWord)
@@ -1173,84 +1060,23 @@ replaceFromMsr bv shift bit = loop bv size shift bit
       | otherwise               = loop (replaceBit# bv index bit) (index - 1) shift bit
 
 
--- isHalted :: CPUState -> Bool
--- isHalted (CPUState Halted _) = True
--- isHalted _                   = False
-
--- Halted Instrucionは許容して
--- なんとか止めたい
-
--- output :: CPUState -> Maybe Output
--- output (CPUState (Outputting output) _) = Just output
--- output _                                = Nothing
-
--- cpuHardware :: (HiddenClockResetEnable dom) => CPUState -> RAM -> Signal dom (Bool, Maybe Output)
--- cpuHardware initialCPUState initialRAM = outputSignal
---   where
---     systemState :: (HiddenClockResetEnable dom) => Signal dom (CPUState, RAM)
---     systemState  = register (initialCPUState, initialRAM) systemState'
---
---     systemState' :: (HiddenClockResetEnable dom) => Signal dom (CPUState, RAM)
---     systemState' = fmap cycle systemState
---
---     getOutput :: (CPUState, RAM) -> (Bool, Maybe Output)
---     getOutput (state, _) = (isHalted state, output state)
---
---     outputSignal :: (HiddenClockResetEnable dom) => Signal dom (Bool, Maybe Output)
---     outputSignal = fmap getOutput systemState'
-
--- TODO(mmichish): ここ再確認してうまくNilで止めたい, debugger機能を使ってみたいghci
--- cpuHardware :: (HiddenClockResetEnable dom) => CPUState -> RAM -> Signal dom (Unsigned 32, Unsigned 32, Unsigned 32)
--- cpuHardware :: (HiddenClockResetEnable dom) => CPUState -> RAM -> Signal dom (Signed 32, Signed 32, Signed 32)
 cpuHardware :: (HiddenClockResetEnable dom) => CPUState -> RAM -> Signal dom Registers
 cpuHardware initialCPUState initialRAM = resultSignal
   where
     systemState  :: (HiddenClockResetEnable dom) => Signal dom (CPUState, RAM)
     systemState  = register (initialCPUState, initialRAM) systemState'
-
     systemState' :: (HiddenClockResetEnable dom) => Signal dom (CPUState, RAM)
     systemState' = fmap cycle systemState
-
-    -- execute :: (CPUState, RAM) -> (Unsigned 32, Unsigned 32, Unsigned 32)
-    -- execute :: (CPUState, RAM) -> (Signed 32, Signed 32, Signed 32)
-    -- execute ((CPUState _ registers), _) = (s2 registers, s3 registers, s4 registers)
     execute :: (CPUState, RAM) -> Registers
     execute ((CPUState _ registers), _) = registers
-    -- execute ((CPUState _ registers), RAM vec) = case length vec of
-      -- 0 -> (x0 registers, x1 registers, x2 registers)
-      -- otherwise -> (x0 registers, x1 registers, x2 registers)
-
-    -- resultSignal :: (HiddenClockResetEnable dom) => Signal dom (Unsigned 32, Unsigned 32, Unsigned 32)
-    -- resultSignal :: (HiddenClockResetEnable dom) => Signal dom (Signed 32, Signed 32, Signed 32)
     resultSignal :: (HiddenClockResetEnable dom) => Signal dom Registers
     resultSignal = fmap execute systemState'
-
--- defaultCPUState :: CPUState
--- defaultCPUState = CPUState LoadingInstruction (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (Ptr 32))
--- defaultCPUState = CPUState LoadingInstruction (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (Ptr 1))
-
 
 initCPUState :: CPUState
 initCPUState = zeroRegisterCPU (Ptr 0)
 
 zeroRegisterCPU :: Ptr -> CPUState
 zeroRegisterCPU ptr = CPUState LoadingInstruction (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ptr)
-
-
--- testAddProgram :: Vec 3 Instruction
--- testAddProgram = I (IArith ADDI (Word12 1) X0 X1) :>
---                 I (IArith ADDI (Word12 2) X0 X2) :>
---                 R (RArith ADD X1 X2 X0) :>
---                 Nil
---
--- -- WARN: Register Number
--- -- rEncode :: RArith arith(SUB) rs2(X2) rs1(X1) rd(X0) and SUB = X[rs1] - X[rs2]
--- testSubProgram = I (IArith ADDI (Word12 2) X0 X1) :>
---                  I (IArith ADDI (Word12 1) X0 X2) :>
---                  R (RArith SUB X2 X1 X0) :>
---                  -- pseudo stop
---                  J (JJal JAL (Word20 3) X3) :> -- ずっとこのInstructionをループする
---                  Nil
 
 testAddProgramWithMinusImm = I (IArith ADDI (Word12 (-1 :: Signed 12)) S2 S3) :>
                              I (IArith ADDI (Word12 (2 :: Signed 12)) S2 S4)  :>
@@ -1267,7 +1093,7 @@ testAddProgramWithMinusImm = I (IArith ADDI (Word12 (-1 :: Signed 12)) S2 S3) :>
 
 -- TODO: Unsigned -> Signedじゃないとだめ
 -- TODO: offsetは基本0x
--- TODO: Addressはどうすればいいんだろう。。。戦闘から数えるでいいのかな。。
+-- TODO: Addressはどうすればいいんだろう。。。先頭から数えるでいいのかな。。
 -- -- human convert : disassem -> instruction
 -- fibFunc = I (IArith ADDI (Word20 -32) SP SP) :> -- addi  sp,sp,-32
 --           S (SStore SW (Word7 X) RA SP (Word5 Y) ) :> -- sw  ra,28(sp)
@@ -1480,51 +1306,8 @@ fibonacciProgram = fibProgram
     --   :> J (JJal JAL (Word20 33) Zero)                                                                     -- j     101d0 (-> jal x0,101d0 に展開される/自身へのループなのでアドレス変更) => 33
     --   :> Nil
 
-
--- TODO: 上記のProgram Codeを実行するためには、
--- 1. Word 7 + Word5みたいなところ、ImmidiateのところはUnsignedにする。
---   ただ、Word7 + Word5でoffset全体を表現する場合、Word12で表現して分割したい
--- 2. JALRの実装
--- 3. アドレスの問題
--- 4. offsetは16進数では？
-
-
--- TODO: 簡単なコードをRISC-V assemblyに変換して動作ささせることを目標とするか
---       その中で具体的にInstructionの構成などを見ていく
---       FPGAで動かすことを考えると最後はLoopでいいんじゃないか？
---       https://kivantium.hateblo.jp/entry/2020/07/24/225016
-
--- programMem :: Vec 32 Word32
--- programMem = fmap encodeInstruction testAddProgramWithMinusImm ++ repeat (Word32 0)
---
--- -> ERRORの内容変わった Vec 3 Word32 こっちはどっちかというと普通にindex vioration
--- λ > programOutput
--- [(0,0,0),(0,0,0),(0,2,0),(0,2,0),(0,2,1),(0,2,1),(1,2,1),(1,2,1)*** Exception: Clash.Sized.Vector.(!!): index 3 is larger than maximum index 2
--- CallStack (from HasCallStack):
---   error, called at src/Clash/Sized/Vector.hs:1249:21 in clash-prelude-1.0.1-4A6pmdbLxfFKg0zr3dNTmC:Clash.Sized.Vector
-
-
--- programMem :: Vec 5 Word32
--- programMem = fmap encodeInstruction testAddProgramWithMinusImm
--- programMem = fmap encodeInstruction testAddProgram
--- programMem = fmap encodeInstruction testSubProgram
 programMem = fmap encodeInstruction fibonacciProgram
 
--- TODO: toProgramのVec n Instruction
--- toProgram :: Functor f => f Instruction -> f Word32
--- toProgram = fmap encodeInstruction
-
--- -- TODO: type pazzle
--- -- toProgram :: Nat n => Vec n Instruction
--- -- programmedRAM :: Nat n, Nat m s.t. m = 100 - n => Vec (n + m) Instruction
--- -- implement type level calculation on KnownNat
--- -- using Data.TypeLits or implement each typefamilies
--- programmedRAM :: Functor f => f Instruction -> RAM
-
--- programmedRAM :: forall n m . (KnownNat n, KnownNat m, (n + m) ~ 1000) => Vec n Word32 -> Vec 1000 Word32
--- programmedRAM inst = f inst (repeat (Word32 0))
-
--- progRAM :: Functor f => f Instruction -> Vec 1000 Word32
 programmedRAM :: (KnownNat n, KnownNat m, (n + m) ~ 1000) => Vec n Instruction -> RAM
 programmedRAM inst = RAM $ paddingEncodedInstruction (fmap encodeInstruction inst) (repeat (Word32 0))
 
@@ -1536,49 +1319,16 @@ paddingEncodedInstruction ::
 paddingEncodedInstruction inst zeroInst = inst ++ zeroInst
 
 
--- Program Lengthではだめ, Evaluateしたところまで
--- simpleProgram :: Vec 3 Word32 -> [(Unsigned 32, Unsigned 32, Unsigned 32)]
--- simpleProgram program = take (length program) $ sample (cpuHardware defaultCPUState (RAM (program ++ repeat (Word32 0))) :: Signal System (Unsigned 32, Unsigned 32, Unsigned 32))
-
--- programCpu :: HiddenClockResetEnable dom => Signal dom (Signed 32, Signed 32, Signed 32)
--- programCpu = cpuHardware defaultCPUState (RAM (programMem ++ repeat (Word32 0)))
-
 programCpu :: HiddenClockResetEnable dom => Signal dom Registers
 programCpu = cpuHardware (zeroRegisterCPU (Ptr 32)) (RAM (programMem ++ repeat (Word32 0)))
--- λ > simpleProgramOutput
--- [(0,0,0),(0,0,0),(2,0,0),(2,0,0),(2,4,0),(2,4,0),(2,4,6),(2,4,6)*** Exception: /Users/mikiyaf/Documents/haskell/Clash/hcpu/riscv-rv32i/src/RV32I.hs:(463,39)-(475,2): Non-exhaustive patterns in case
 
--- programmedRAMの引数に、RV32I.RV32I.Programs のVec n Instructionを食わせて実行できる
+-- You can play code in RV32I.RV32I.Programs.Example like follow
 -- >>> Prelude.take 10 $ sample (cpu initCPUState (programmedRAM addImmValues) :: Signal System Registers)
 cpu :: HiddenClockResetEnable dom => CPUState -> RAM -> Signal dom Registers
 cpu = cpuHardware
-
-
--- TODO(mmichish) 停止方法を考えたい. もしくは結果をうまく取る方法を考えたい
--- takeは無限長から可変長要素を取るため必要。
--- sample (programCpu) の実行時点でExceptionは発生する。
--- うーんやっぱ理解不足が問題だな、cpuHardwareとその時に使っている関数（register）の動きとかをちゃんと把握する必要がある。
--- programOutput :: [(Signed 32, Signed 32, Signed 32)]
--- programOutput = take 100 $ sample (programCpu :: Signal System (Signed 32, Signed 32, Signed 32))
 
 programResult :: [Registers]
 programResult = take 100 $ sample (programCpu :: Signal System Registers)
 
 programOutput :: IO ()
 programOutput = mapM_ print programResult
-
--- debugProgram :: IO ()
--- debugProgram = do
---   let ram = RAM (programMem ++ repeat (Word32 0))
---       cpu = cpuHardware defaultCPUState ram
---   mapM_ print (take 10 $ sample (programCpu :: Signal System Registers))
---   print ram -- show final results of RAM
---   print "-------- Print Debug (RAM) -----------"
---   -- debug sw instruction
---   print $ readRAM ram 1
---   print $ readWord32 $ readRAM ram 1
---   where
---     readRAM :: RAM -> Int -> Word32
---     readRAM (RAM vec) index = vec !! index
---     readWord32 :: Word32 -> Signed 32
---     readWord32 (Word32 signed) = signed
