@@ -70,8 +70,9 @@ However, some instruction sets, s.t. FENCE, FENCEI, ... are not implemented yet.
 
 ## TODO
 * [x] Add Test
-* [ ] Refactor Codes
-* [ ] Consider relation between `Vec n Instruction` and address space
+* [x] Refactor Codes
+* [x] Consider relation between `Vec n Instruction` and address space
+* [ ] Create fibonacci function and check it's execution
 * [ ] Check working on compiled Verilog-HDL
 * [ ] Check working on FPGA
 
