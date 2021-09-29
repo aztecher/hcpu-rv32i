@@ -1,8 +1,11 @@
 module TestUtils.Program where
 
+import RV32I.Instruction
+import RV32I.Register
+import RV32I.RAM
+import RV32I.CPU
 import Clash.Signal (Signal, System, sample)
 import Clash.Sized.Vector(Vec)
-import RV32I.RV32I
 import GHC.TypeLits
 
 calculateDefaultSetup ::

@@ -6,16 +6,18 @@ import Clash.Class.BitPack (pack, unpack)
 import Clash.Sized.BitVector (BitVector, (++#))
 import Clash.Sized.Signed (Signed)
 import Clash.Sized.Vector (Vec (Nil, (:>)))
-import RV32I.RV32I
+import RV32I.Instruction
+import RV32I.Word
+import RV32I.Format
+import RV32I.Register
 
 -- Test ADDI/ADD/JAL
-addImm :: Vec 4 Instruction
+-- addImm :: Vec 4 Instruction
 addImm =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> R (RArith ADD S1 S2 S0)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test ADDI/ADD/JAL
@@ -24,8 +26,7 @@ addPlusMinus =
   I (IArith ADDI (Word12 (-1 :: Signed 12)) S2 S3)
     :> I (IArith ADDI (Word12 2) S2 S4)
     :> R (RArith ADD S3 S4 S2)
-    --pesudo stop
-    :> J (JJal JAL (Word20 3) S5)
+    :> J (JJal JAL (Word20 0) S5)
     :> Nil
 
 -- Test ADDI/SUB/JAL
@@ -34,8 +35,7 @@ subImm =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> R (RArith SUB S2 S1 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test ADDI/AND
@@ -44,8 +44,7 @@ andImm :: Vec 3 Instruction
 andImm =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ANDI (Word12 1) S1 S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test ADDI/ANDI
@@ -55,8 +54,7 @@ andDiff =
   I (IArith ADDI (Word12 3) Zero S1)
   :> I (IArith ADDI (Word12 5) Zero S2)
   :> R (RArith AND S1 S2 S3)
-  -- pesudo stop
-  :> J (JJal JAL (Word20 3) S4)
+  :> J (JJal JAL (Word20 0) S4)
   :> Nil
 
 -- Test ADDI/ORI
@@ -65,8 +63,7 @@ orImm :: Vec 3 Instruction
 orImm =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ORI (Word12 1) S1 S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test ADDI/OR
@@ -76,8 +73,7 @@ orDiff =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith OR S1 S2 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test ADDI/XORI
@@ -86,8 +82,7 @@ xorImm :: Vec 3 Instruction
 xorImm =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith XORI (Word12 1) S1 S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test ADDI/XOR
@@ -97,8 +92,7 @@ xorDiff =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith XOR S1 S2 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SLL
@@ -107,21 +101,21 @@ sll =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IArith ADDI (Word12 4) Zero S2)
     :> R (RArith SLL S2 S1 S3)
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SLLI Msb is '0'
 slliMsbZero =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IShift SLLI (Word5 4) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SLLI Msb is '1' (actually, unconsidered case)
 slliMsbOne =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IShift SLLI (Word5 (-1 :: Signed 5)) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 
@@ -131,7 +125,7 @@ sraPlus =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith SRA S2 S1 S3)
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SRA
@@ -140,7 +134,7 @@ sraMinus =
   I (IArith ADDI (Word12 (-1024 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith SRA S2 S1 S3)
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 
@@ -149,7 +143,7 @@ sraMinus =
 sraiPlus =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IShift SRAI (Word5 5) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SRAI
@@ -158,7 +152,7 @@ sraiPlus =
 sraiMinusShift =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IShift SRAI (Word5 (-5 :: Signed 5)) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SRL
@@ -167,7 +161,7 @@ srlPlus =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith SRL S2 S1 S3)
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SRL minus value
@@ -180,7 +174,7 @@ srlMinus =
   I (IArith ADDI (Word12 (-1024 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 5) Zero S2)
     :> R (RArith SRL S2 S1 S3)
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SRLI plus value
@@ -188,7 +182,7 @@ srlMinus =
 srliPlus =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IShift SRLI (Word5 5) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- minus shift value don't affect (unexpected case)
@@ -196,16 +190,15 @@ srliPlus =
 srliMinusShift =
   I (IArith ADDI (Word12 1024) Zero S1)
     :> I (IShift SRLI (Word5 (-5 :: Signed 5)) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
--- Test JALR
--- pc = S1(1) + offset(1) = 2 = 0010 (even number)
+-- pc = S1(1) + offset(1) = 2 = 0010
 -- rd = 2(pc of JALR) + 1 (next inst) = 3
 jalr =
-  I (IArith ADDI (Word12 1) Zero S1)
-    :> I (IJalr JALR (Word12 1) S1 S2)
-    :> J (JJal JAL (Word20 2) S3)
+  I (IArith ADDI (Word12 32) Zero S1)
+    :> I (IJalr JALR (Word12 0) S1 S2)
+    -- :> I (IJalr JALR (Word12 32) S1 S2)
     :> Nil
 
 -- Test SLTI lt
@@ -214,8 +207,7 @@ sltImmLt :: Vec 3 Instruction
 sltImmLt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith SLTI (Word12 2) S1 S2)
-  -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SLTI geq
@@ -224,8 +216,7 @@ sltImmGt :: Vec 3 Instruction
 sltImmGt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith SLTI (Word12 (-2 :: Signed 12)) S1 S2)
-    --pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SLT lt
@@ -234,8 +225,7 @@ sltDiffLt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> R (RArith SLT S2 S1 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SLT geq
@@ -244,8 +234,7 @@ sltDiffGt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S2)
     :> R (RArith SLT S2 S1 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SLTIU lt
@@ -253,8 +242,7 @@ sltiuLt :: Vec 3 Instruction
 sltiuLt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith SLTIU (Word12 15) S1 S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SLTIU geq
@@ -262,8 +250,7 @@ sltiuGeq :: Vec 3 Instruction
 sltiuGeq =
   I (IArith ADDI (Word12 8) Zero S1)
     :> I (IArith SLTIU (Word12 8) S1 S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 2) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
 -- Test SLTU lt
@@ -272,8 +259,7 @@ sltuDiffLt =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 15) Zero S2)
     :> R (RArith SLTU S2 S1 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SLTU geq
@@ -282,8 +268,7 @@ sltuDiffGt =
   I (IArith ADDI (Word12 12) Zero S1)
     :> I (IArith ADDI (Word12 8) Zero S2)
     :> R (RArith SLTU S2 S1 S3)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
 
 -- Test SB/LB
@@ -291,8 +276,7 @@ sblb =
   I (IArith ADDI (Word12 1) Zero S1)
     :> S (SStore SB (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LB (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -304,8 +288,7 @@ sblbOverByte =
   I (IArith ADDI (Word12 256) Zero S1)
     :> S (SStore SB (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LB (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -317,8 +300,7 @@ shlh =
   I (IArith ADDI (Word12 256) Zero S1)
     :> S (SStore SH (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LH (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -331,8 +313,7 @@ shlhOver2Byte =
   I (IArith ADDI (Word12 65536) Zero S1)
     :> S (SStore SH (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LH (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -342,9 +323,8 @@ shlhOver2Byte =
 swlw =
   I (IArith ADDI (Word12 256) Zero S1)
     :> S (SStore SW (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
-    :> I (ILoad LH (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> I (ILoad LW (Word12 offset) Zero S2)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -354,8 +334,7 @@ sblbu =
   I (IArith ADDI (Word12 1) Zero S1)
     :> S (SStore SB (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LBU (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -366,8 +345,7 @@ sblbuMsbOne =
   I (IArith ADDI (Word12 8) Zero S1)
     :> S (SStore SB (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LBU (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -377,8 +355,7 @@ shlhu =
   I (IArith ADDI (Word12 1) Zero S1)
     :> S (SStore SH (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LHU (Word12 offset) Zero S2)
-    -- pesudo stop
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
@@ -389,26 +366,22 @@ shlhuMsbOne =
   I (IArith ADDI (Word12 128) Zero S1)
     :> S (SStore SH (_slice_to_word7 offset) S1 Zero (_slice_to_word5 offset))
     :> I (ILoad LHU (Word12 offset) Zero S2)
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3)
     :> Nil
   where
     offset = 900
-
--- RECONSIDER: BFormat require imm value is even value?
--- (more accurately, it represent the address space,
---  and, address space will 4byte unit)
 
 -- Test BEQ equal pattern
 beq =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BEQ offset7 S2 S1 offset5)
-    :> J (JJal JAL (Word20 3) S3)
-    :> I (IArith ADDI (Word12 0) Zero S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 0) S3)
+    :> I (IArith ADDI (Word12 0) Zero S3) -- +64Byte from BEQ instruction
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 64
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BEQ not equal pattern
@@ -416,12 +389,12 @@ beqNg =
   I (IArith ADDI (Word12 2) Zero S1)
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BEQ offset7 S2 S1 offset5)
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3) -- +32Byte (next instruction) from BEQ instruction
     :> I (IArith ADDI (Word12 0) Zero S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 64
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BNE not equal pattern
@@ -429,12 +402,12 @@ bne =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BNE offset7 S2 S1 offset5)
-    :> J (JJal JAL (Word20 3) S3)
+    :> J (JJal JAL (Word20 0) S3) -- +32Byte (next instruction) from BEQ instruction
     :> I (IArith ADDI (Word12 0) Zero S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 64
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BNE equal pattern
@@ -442,140 +415,144 @@ bneNg =
   I (IArith ADDI (Word12 0) Zero S1)
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BNE offset7 S2 S1 offset5)
-    :> J (JJal JAL (Word20 3) S3)
-    :> I (IArith ADDI (Word12 0) Zero S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 0) S3)
+    :> I (IArith ADDI (Word12 0) Zero S3) -- +64Byte from BEQ instruction
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 64
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BLT lt and plus pattern
+-- Test BLT lt case of plus pattern
 bltLtPlus =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLT offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BLT lt and minus pattern
+
+-- Test BLT lt case of minus pattern
 bltLtMinus =
   I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BLT geq and plus pattern
+-- Test BLT geq case of plus pattern
 bltGeqPlus =
   I (IArith ADDI (Word12 3) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BLT geq and minus pattern
+-- Test BLT geq case of minus pattern
 bltGeqMinus =
   I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BGE
+-- Test BGE ge case of plus pattern
 bgeGePlus =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
+-- Test BGE ge case of minus pattern
 bgeGeMinus =
   I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
+-- Test BGE lt case of plus pattern
 bgeLtPlus =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
+-- Test BGE lt case of minus pattern
 bgeLtMinus =
   I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S1)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 
--- Test BLTU lt
+-- Test BLTU lt case
 bltult =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLTU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BLTU ge
+-- Test BLTU ge case
 bltuge =
   I (IArith ADDI (Word12 2) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLTU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGEU ge
@@ -584,45 +561,48 @@ bgeuge =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGEU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
--- Test BGEU lt
+-- Test BGEU lt case
 bgeult =
   I (IArith ADDI (Word12 1) Zero S1)
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGEU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 2) S3)
-    :> J (JJal JAL (Word20 5) S4)
+    :> J (JJal JAL (Word20 (-64 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 2
+    offset = 96
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test LUI plus value
 -- 5 * 2 ^ 12 = 5 * 4096 = 20480
 luiPlus =
   U (UArith LUI (Word20 5) S1)
-    :> J (JJal JAL (Word20 1) S2)
+    :> J (JJal JAL (Word20 0) S2)
     :> Nil
 
 -- Test LUI minus value
 -- -5 ( 2 ^ 12 = -5 * 4096 = -20480
 luiMinus =
   U (UArith LUI (Word20 (-5 :: Signed 20)) S1)
-    :> J (JJal JAL (Word20 1) S2)
+    :> J (JJal JAL (Word20 0) S2)
     :> Nil
 
 -- Test AUIPC
 auipc =
   U (UArith AUIPC (Word20 5) S1)
-    :> J (JJal JAL (Word20 1) S2)
+    :> J (JJal JAL (Word20 0) S2)
     :> Nil
+
+-- Test JAL
+jal = J (JJal JAL (Word20 0) S1) :> Nil
 
 _slice_to_word7 :: Signed 12 -> Word7
 _slice_to_word7 num

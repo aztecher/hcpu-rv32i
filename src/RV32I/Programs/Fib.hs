@@ -1,6 +1,6 @@
 module RV32I.Programs.Fib where
 
-import RV32I.RV32I
+import RV32I.DSL
 import Clash.Sized.Vector (Vec((:>), Nil))
 
 -- 実行はclash-compile もしくは(clashi)にて行う必要がある。

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 98e9151db8c290c750e99d37fb4ea1d449b2be10ede76ac8d9053cb4fc079a34
+-- hash: 109bfe16dbeb674ce978fd1bfc42d395f8d862cdc3ca52f4044b1ec96756f3da
 
 name:           riscv-rv32i
 version:        0.1.0.0
@@ -27,10 +27,15 @@ source-repository head
 
 library
   exposed-modules:
+      RV32I.CPU
       RV32I.DSL
+      RV32I.Format
+      RV32I.Instruction
       RV32I.Programs.Example
       RV32I.Programs.Fib
-      RV32I.RV32I
+      RV32I.RAM
+      RV32I.Register
+      RV32I.Word
   other-modules:
       Paths_riscv_rv32i
   hs-source-dirs:
@@ -48,6 +53,8 @@ library
       MagicHash
       TypeOperators
       TypeFamilies
+      GADTs
+      PolyKinds
   build-depends:
       HUnit
     , QuickCheck >=2.14.2
@@ -59,6 +66,7 @@ library
     , ghc-typelits-natnormalise
     , hspec
     , pretty-simple
+    , typelits-witnesses
   default-language: Haskell2010
 
 executable riscv-rv32i-exe
@@ -80,6 +88,8 @@ executable riscv-rv32i-exe
       MagicHash
       TypeOperators
       TypeFamilies
+      GADTs
+      PolyKinds
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit
@@ -93,15 +103,19 @@ executable riscv-rv32i-exe
     , hspec
     , pretty-simple
     , riscv-rv32i
+    , typelits-witnesses
   default-language: Haskell2010
 
 test-suite riscv-rv32i-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      RV32I.CPUSpec
       RV32I.DSLSpec
+      RV32I.InstructionSpec
       RV32I.Programs.ExampleSpec
-      RV32I.RV32ISpec
+      RV32I.RAMSpec
+      RV32I.RegisterSpec
       TestUtils.Common
       TestUtils.Program
       Paths_riscv_rv32i
@@ -120,6 +134,8 @@ test-suite riscv-rv32i-test
       MagicHash
       TypeOperators
       TypeFamilies
+      GADTs
+      PolyKinds
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit
@@ -133,4 +149,5 @@ test-suite riscv-rv32i-test
     , hspec
     , pretty-simple
     , riscv-rv32i
+    , typelits-witnesses
   default-language: Haskell2010

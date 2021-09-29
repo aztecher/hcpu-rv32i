@@ -24,6 +24,7 @@ dependencies:
 - ghc-typelits-natnormalise
 - ghc-typelits-extra
 - ghc-typelits-knownnat
+- typelits-witnesses
 - clash-prelude
 - deepseq
 - hspec
@@ -44,6 +45,8 @@ default-extensions:
 - MagicHash
 - TypeOperators
 - TypeFamilies
+- GADTs
+- PolyKinds
 
 library:
   source-dirs: src

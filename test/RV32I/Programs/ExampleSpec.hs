@@ -1,9 +1,12 @@
 module RV32I.Programs.ExampleSpec where
 
+import RV32I.Register
+import RV32I.Format
+import RV32I.RAM
+import RV32I.CPU
 import Clash.Sized.BitVector (Bit, BitVector)
 import Clash.Sized.Signed (Signed)
 import Clash.Sized.Vector (Vec (Nil, (:>)), listToVecTH, repeat)
-import RV32I.RV32I as RV32I
 import RV32I.Programs.Example as Example
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
@@ -25,8 +28,8 @@ spec = do
           s0fp = 3,
           s1 = 1,
           s2 = 2,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "addPlusMinus") $ do
     it "check addPlusMinus" $ do
@@ -35,8 +38,8 @@ spec = do
           s2 = 1,
           s3 = -1,
           s4 = 2,
-          s5 = 5,
-          pc = Ptr 4
+          s5 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "subImm") $ do
     it "check subImm" $ do
@@ -45,8 +48,8 @@ spec = do
           s1 = 1,
           s2 = 2,
           s3 = -1,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "andImm") $ do
     it "check andImm" $ do
@@ -54,8 +57,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "andDiff") $ do
     it "check andDiff" $ do
@@ -64,8 +67,8 @@ spec = do
           s1 = 3,
           s2 = 5,
           s3 = 1,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "orImm") $ do
     it "check orImm" $ do
@@ -73,8 +76,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "orDiff") $ do
     it "check orDiff" $ do
@@ -83,8 +86,8 @@ spec = do
           s1 = 3,
           s2 = 5,
           s3 = 7,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "xorImm") $ do
     it "check xorImm" $ do
@@ -92,8 +95,8 @@ spec = do
         {
           s1 = 1,
           s2 = 0,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "xorDiff") $ do
     it "check xorDiff" $ do
@@ -102,8 +105,8 @@ spec = do
           s1 = 3,
           s2 = 5,
           s3 = 6,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sll") $ do
     it "check sll" $ do
@@ -112,8 +115,8 @@ spec = do
           s1 = 3,
           s2 = 4,
           s3 = 48,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "slliMsbZero") $ do
     it "check slliMsbZero" $ do
@@ -121,8 +124,8 @@ spec = do
         {
           s1 = 3,
           s2 = 48,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "slliMsbOne") $ do
     it "check slliMsbOne" $ do
@@ -130,8 +133,8 @@ spec = do
         {
           s1 = 3,
           s2 = 3,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sraPlus") $ do
     it "check sraPlus" $ do
@@ -140,8 +143,8 @@ spec = do
           s1 = 1024,
           s2 = 5,
           s3 = 32,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sraMinus") $ do
     it "check sraMinus" $ do
@@ -150,8 +153,8 @@ spec = do
           s1 = -1024,
           s2 = 5,
           s3 = -32,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sraiPlus") $ do
     it "check sraiPlus" $ do
@@ -159,8 +162,8 @@ spec = do
         {
           s1 = 1024,
           s2 = 32,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sraiMinus") $ do
     it "check sraiMinus" $ do
@@ -168,8 +171,8 @@ spec = do
         {
           s1 = 1024,
           s2 = 1024,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "srlPlus") $ do
     it "check srlPlus" $ do
@@ -178,8 +181,8 @@ spec = do
           s1 = 1024,
           s2 = 5,
           s3 = 32,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "srlMinus") $ do
     it "check srlMinus" $ do
@@ -188,8 +191,8 @@ spec = do
           s1 = -1024,
           s2 = 5,
           s3 = 134217696,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "srliPlus") $ do
     it "check srliPlus" $ do
@@ -197,8 +200,8 @@ spec = do
         {
           s1 = 1024,
           s2 = 32,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "srliMinusShift") $ do
     it "check srliMinusShift" $ do
@@ -206,17 +209,16 @@ spec = do
         {
           s1 = 1024,
           s2 = 1024,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "jalr") $ do
     it "check jalr" $ do
       UtilProgram.calculateDefaultSetup jalr `shouldBe` zeroRegisters
         {
-          s1 = 1,
-          s2 = 3,
-          s3 = 4,
-          pc = Ptr 3
+          s1 = 32,
+          s2 = 64,
+          pc = Ptr . Offset $ 32
         }
   describe (unitTag <> "sltImmLt") $ do
     it "check sltImmLt" $ do
@@ -224,8 +226,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sltImmGt") $ do
     it "check sltImmGt" $ do
@@ -233,8 +235,8 @@ spec = do
         {
           s1 = 1,
           s2 = 0,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sltDiffLt") $ do
     it "check sltDiffLt" $ do
@@ -243,8 +245,8 @@ spec = do
           s1 = 1,
           s2 = 2,
           s3 = 1,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sltDiffGt") $ do
     it "check sltDiffGt" $ do
@@ -253,8 +255,8 @@ spec = do
           s1 = 1,
           s2 = -2,
           s3 = 0,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sltiuLt") $ do
     it "check sltiuLt" $ do
@@ -262,8 +264,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sltiuGeq") $ do
     it "check sltiuGeq" $ do
@@ -271,8 +273,8 @@ spec = do
         {
           s1 = 8,
           s2 = 0,
-          s3 = 4,
-          pc = Ptr 3
+          s3 = 96,
+          pc = Ptr . Offset $ 64
         }
   describe (unitTag <> "sltuDiffLt") $ do
     it "check sltuDiffLt" $ do
@@ -281,8 +283,8 @@ spec = do
           s1 = 1,
           s2 = 15,
           s3 = 1,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sltuDiffGt") $ do
     it "check sltuDiffGt" $ do
@@ -291,8 +293,8 @@ spec = do
           s1 = 12,
           s2 = 8,
           s3 = 0,
-          s4 = 5,
-          pc = Ptr 4
+          s4 = 128,
+          pc = Ptr . Offset $ 96
         }
 
   describe (unitTag <> "sblb") $ do
@@ -301,8 +303,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sblbOverByte") $ do
     it "check sblbOverByte" $ do
@@ -310,8 +312,8 @@ spec = do
         {
           s1 = 256,
           s2 = 0,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "shlh") $ do
     it "check shlh" $ do
@@ -319,8 +321,8 @@ spec = do
         {
           s1 = 256,
           s2 = 256,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "shlhOver2Byte") $ do
     it "check shlhOver2Byte" $ do
@@ -328,8 +330,8 @@ spec = do
         {
           s1 = 0,
           s2 = 0,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "swlw") $ do
     it "check swlw" $ do
@@ -337,8 +339,8 @@ spec = do
         {
           s1 = 256,
           s2 = 256,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sblbu") $ do
     it "check sblbu" $ do
@@ -346,8 +348,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "sblbuMsbOne") $ do
       it "check sblbuMsbOne" $ do
@@ -355,8 +357,8 @@ spec = do
           {
             s1 = 8,
             s2 = 8,
-            s3 = 5,
-            pc = Ptr 4
+            s3 = 128,
+            pc = Ptr . Offset $ 96
           }
   describe (unitTag <> "shlhu") $ do
     it "check shlhu" $ do
@@ -364,8 +366,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "shlhuMsbOne") $ do
     it "check shlhuMsbOne" $ do
@@ -373,8 +375,8 @@ spec = do
         {
           s1 = 128,
           s2 = 128,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "beq") $ do
     it "check beq" $ do
@@ -382,17 +384,17 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "beqNg") $ do
-    it "check beq" $ do
+    it "check beqNg" $ do
       UtilProgram.calculateDefaultSetup beqNg `shouldBe` zeroRegisters
         {
           s1 = 2,
           s2 = 1,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "bne") $ do
     it "check bne" $ do
@@ -400,8 +402,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s3 = 5,
-          pc = Ptr 4
+          s3 = 128,
+          pc = Ptr . Offset $ 96
         }
   describe (unitTag <> "bneNg") $ do
     it "check bneNg" $ do
@@ -409,8 +411,8 @@ spec = do
         {
           s1 = 0,
           s2 = 1,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltLtPlus") $ do
     it "check bltLtPlus" $ do
@@ -418,8 +420,8 @@ spec = do
         {
           s1 = 1,
           s2 = 2,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltLtMinus") $ do
     it "check bltLtMinus" $ do
@@ -427,8 +429,8 @@ spec = do
         {
           s1 = -2,
           s2 = -1,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltGeqPlus") $ do
     it "check bltGeqPlus" $ do
@@ -436,9 +438,9 @@ spec = do
         {
           s1 = 1,
           s2 = 2,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltGeqMinus") $ do
     it "check bltGeqMinus" $ do
@@ -446,9 +448,9 @@ spec = do
         {
           s1 = -3,
           s2 = -2,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeGePlus") $ do
     it "check bgeGePlus" $ do
@@ -456,8 +458,8 @@ spec = do
         {
           s1 = 1,
           s2 = 1,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeGeMinus") $ do
     it "check bgeGeMinus" $ do
@@ -465,8 +467,8 @@ spec = do
         {
           s1 = -1,
           s2 = -2,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeLtPlus") $ do
     it "check bgeLtPlus" $ do
@@ -474,9 +476,9 @@ spec = do
         {
           s1 = 2,
           s2 = 2,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeLtMinus") $ do
     it "check bgeLtMinus" $ do
@@ -484,9 +486,9 @@ spec = do
         {
           s1 = -1,
           s2 = -1,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltult") $ do
     it "check bltult" $ do
@@ -494,8 +496,8 @@ spec = do
         {
           s1 = 1,
           s2 = 2,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bltuge") $ do
     it "check bltuge" $ do
@@ -503,9 +505,9 @@ spec = do
         {
           s1 = 1,
           s2 = 2,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeuge") $ do
     it "check bgeuge" $ do
@@ -513,8 +515,8 @@ spec = do
         {
           s1 = 2,
           s2 = 2,
-          s4 = 7,
-          pc = Ptr 6
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "bgeult") $ do
     it "check bgeult" $ do
@@ -522,31 +524,38 @@ spec = do
         {
           s1 = 2,
           s2 = 2,
-          s3 = 6,
-          s4 = 7,
-          pc = Ptr 6
+          s3 = 160,
+          s4 = 192,
+          pc = Ptr . Offset $ 160
         }
   describe (unitTag <> "luiPlus") $ do
     it "check luiPlus" $ do
       UtilProgram.calculateDefaultSetup luiPlus `shouldBe` zeroRegisters
         {
           s1 = 20480,
-          s2 = 3,
-          pc = Ptr 2
+          s2 = 64,
+          pc = Ptr . Offset $ 32
         }
   describe (unitTag <> "luiMinus") $ do
     it "check luiMinus" $ do
       UtilProgram.calculateDefaultSetup luiMinus `shouldBe` zeroRegisters
         {
           s1 = -20480,
-          s2 = 3,
-          pc = Ptr 2
+          s2 = 64,
+          pc = Ptr . Offset $ 32
         }
   describe (unitTag <> "auipc") $ do
     it "check auipc" $ do
       UtilProgram.calculateDefaultSetup auipc `shouldBe` zeroRegisters
         {
-          s1 = 20481,
-          s2 = 3,
-          pc = Ptr 2
+          s1 = 20480,
+          s2 = 64,
+          pc = Ptr . Offset $ 32
+        }
+  describe (unitTag <> "jal") $ do
+    it "check jal" $ do
+      UtilProgram.calculateDefaultSetup jal `shouldBe` zeroRegisters
+        {
+          s1 = 32,
+          pc = Ptr . Offset $ 0
         }

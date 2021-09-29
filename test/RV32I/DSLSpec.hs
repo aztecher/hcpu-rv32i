@@ -1,7 +1,10 @@
 module RV32I.DSLSpec where
 
 import RV32I.DSL as DSL
-import RV32I.RV32I
+import RV32I.Register
+import RV32I.Format
+import RV32I.Word
+import RV32I.Instruction
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC

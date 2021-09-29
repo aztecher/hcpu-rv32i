@@ -1,6 +1,9 @@
 module RV32I.DSL where
 
-import RV32I.RV32I
+import RV32I.Instruction
+import RV32I.Register
+import RV32I.Word
+import RV32I.Format
 import Clash.Prelude (slice)
 import Clash.Sized.Signed (Signed)
 import Clash.Sized.BitVector (BitVector, (++#))
