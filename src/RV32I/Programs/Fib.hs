@@ -1,16 +1,8 @@
 module RV32I.Programs.Fib where
 
 import RV32I.DSL
+import RV32I.Register
 import Clash.Sized.Vector (Vec((:>), Nil))
-
--- 実行はclash-compile もしくは(clashi)にて行う必要がある。
--- clashiを起動し :load でRV32I/RV32I.hsと同時に読み込めばOK
--- $ pwd
--- /Users/mikiyaf/clash-compiler
--- $ stack run -- clashi
--- Clash.Prelude> :l  /Users/mikiyaf/Documents/haskell/Clash/hcpu/riscv-rv32i/src/RV32I/RV32I.hs  /Users/mikiyaf/Documents/haskell/Clash/hcpu/riscv-rv32i/src/RV32I/Programs/Fib.hs
---
--- >> だめかも
 
 -- 変換対象のコード（C)
 -- int fib(int n) {
@@ -65,4 +57,50 @@ import Clash.Sized.Vector (Vec((:>), Nil))
 --    101c8:       f7dff0ef                jal     ra,10144 <fib>
 --    101cc:       fea42623                sw      a0,-20(s0)
 --    101d0:       0000006f                j       101d0 <main+0x1c>
+
+fibonacci =
+     addi SP SP (-32)  -- pc = 0
+  :> sw   RA 28 SP     -- pc = 32
+  :> sw   S0 24 SP     -- pc = 64
+  :> sw   S1 20 SP     -- pc = 96
+  :> addi S0 SP 32     -- pc = 128
+  :> sw   A0 (-20) S0  -- pc = 160
+  :> lw   A4 (-20) S0  -- pc = 192
+  :> li   A5 1         -- pc = 224
+  :> blt  A5 A4 96     -- pc = 256 / if True then jamp to pc=352
+  :> li   A5 1         -- pc = 288
+  :> j    384          -- pc = 320 / jamp to pc=704
+  :> lw   A5 (-20) S0  -- pc = 352
+  :> addi A5 A5 (-1)   -- pc = 384
+  :> mv   A0 A5        -- pc = 416
+  :> jal  RA (-448)    -- pc = 448 / return to fib first
+  :> mv   S1 A0        -- pc = 480
+  :> lw   A5 (-20) S0  -- pc = 512
+  :> addi A5 A5 (-2)   -- pc = 554
+  :> mv   A0 A5        -- pc = 576
+  :> jal  RA (-608)    -- pc = 608 / return to fib first
+  :> mv   A5 A0        -- pc = 640
+  :> add  A5 S1 A5     -- pc = 672
+  :> mv   A0 A5        -- pc = 704
+  :> lw   RA 28 SP     -- pc = 736
+  :> lw   S0 24 SP     -- pc = 768
+  :> lw   S1 20 SP     -- pc = 800
+  :> addi SP SP 32     -- pc = 832
+  :> ret               -- pc = 864
+  -- start main function
+  :> addi SP SP 2016  -- pc = 896 / program data are located in 'Highest address - offset'
+  :> addi SP SP (-32 * 4)  -- pc = 928
+  :> sw   RA 28  SP    -- pc = 960
+  :> sw   S0 24  SP    -- pc = 992
+  :> addi S0 SP 32     -- pc = 1024
+  :> li   A0 3         -- pc = 1056 / fib(n=3) of n
+  :> jal  RA (-1088)   -- pc = 1088 / jamp to Fibonacci
+  :> j 0               -- pc = 1120 / jamp here and loop
+  :> Nil
+  where
+    -- Pseudo instructions
+    mv rd rs1 = addi rd rs1 0
+    li rd imm = addi rd T6 imm
+    j  offset = jal Zero offset
+    ret       = jalr Zero 0 RA
 

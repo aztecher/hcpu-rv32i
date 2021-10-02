@@ -74,37 +74,37 @@ srai rd rs1 shamt = I (IShift SRAI (Word5 shamt) rs1 rd)
 srli :: Register -> Register -> Signed 5 -> Instruction
 srli rd rs1 shamt = I (IShift SRLI (Word5 shamt) rs1 rd)
 --  JALR
-jalr :: Register -> Register -> Signed 12 -> Instruction
-jalr rd rs1 offset = I (IJalr JALR (Word12 offset) rs1 rd)
+jalr :: Register -> Signed 12 -> Register -> Instruction
+jalr rd offset rs1 = I (IJalr JALR (Word12 offset) rs1 rd)
 --  LB
-lb :: Register -> Register -> Signed 12 -> Instruction
-lb rd rs1 offset = I (ILoad LB (Word12 offset) rs1 rd)
+lb :: Register -> Signed 12 -> Register -> Instruction
+lb rd offset rs1 = I (ILoad LB (Word12 offset) rs1 rd)
 --  LH
-lh :: Register -> Register -> Signed 12 -> Instruction
-lh rd rs1 offset = I (ILoad LH (Word12 offset) rs1 rd)
+lh :: Register -> Signed 12 -> Register -> Instruction
+lh rd offset rs1 = I (ILoad LH (Word12 offset) rs1 rd)
 --  LW
-lw :: Register -> Register -> Signed 12 -> Instruction
-lw rd rs1 offset = I (ILoad LW (Word12 offset) rs1 rd)
+lw :: Register -> Signed 12 -> Register -> Instruction
+lw rd offset rs1 = I (ILoad LW (Word12 offset) rs1 rd)
 --  LBU
-lbu :: Register -> Register -> Signed 12 -> Instruction
-lbu rd rs1 offset = I (ILoad LBU (Word12 offset) rs1 rd)
+lbu :: Register -> Signed 12 -> Register -> Instruction
+lbu rd offset rs1 = I (ILoad LBU (Word12 offset) rs1 rd)
 --  LHU
-lhu :: Register -> Register -> Signed 12 -> Instruction
-lhu rd rs1 offset = I (ILoad LHU (Word12 offset) rs1 rd)
+lhu :: Register -> Signed 12 -> Register -> Instruction
+lhu rd offset rs1 = I (ILoad LHU (Word12 offset) rs1 rd)
 --S-type Format
 --  SB
-sb :: Register -> Register -> Signed 12 -> Instruction
-sb rs2 rs1 offset = S (SStore SB offset7 rs2 rs1 offset5)
+sb :: Register -> Signed 12 -> Register -> Instruction
+sb rs2 offset rs1 = S (SStore SB offset7 rs2 rs1 offset5)
   where
        (offset7, offset5) = _make_offsets_of_sformat offset
 --  SH
-sh :: Register -> Register -> Signed 12 -> Instruction
-sh rs2 rs1 offset = S (SStore SH offset7 rs2 rs1 offset5)
+sh :: Register -> Signed 12 -> Register -> Instruction
+sh rs2 offset rs1 = S (SStore SH offset7 rs2 rs1 offset5)
   where
        (offset7, offset5) = _make_offsets_of_sformat offset
 --  SW
-sw :: Register -> Register -> Signed 12 -> Instruction
-sw rs2 rs1 offset = S (SStore SW offset7 rs2 rs1 offset5)
+sw :: Register -> Signed 12 -> Register -> Instruction
+sw rs2 offset rs1 = S (SStore SW offset7 rs2 rs1 offset5)
   where
        (offset7, offset5) = _make_offsets_of_sformat offset
 --B-type Format (RECONSIDER)

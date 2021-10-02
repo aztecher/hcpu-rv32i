@@ -17,11 +17,12 @@ import GHC.TypeLits
 
 
 -- RAM
-data RAM = RAM (Vec 1000 Word32) deriving (Show, Eq, Generic, NFDataX)
+-- data RAM = RAM (Vec 3000 Word32) deriving (Show, Eq, Generic, NFDataX)
+data RAM = RAM (Vec 64 Word32) deriving (Show, Eq, Generic, NFDataX)
 -- newtype Ptr = Ptr (Signed 32) deriving (Show, Eq, Generic, NFDataX)
 newtype Ptr = Ptr Offset deriving (Show, Eq, Generic, NFDataX)
 
-data Address = Address (Vec 32000 (BitVector 1)) deriving (Show, Eq, Generic, NFDataX)
+data Address = Address (Vec 2048 (BitVector 1)) deriving (Show, Eq, Generic, NFDataX)
 type AddressL = [BitVector 1]
 data Offset  = Offset Int deriving (Show, Read, Eq, Generic, NFDataX)
 
@@ -77,14 +78,14 @@ increment (Ptr (Offset offset)) = Ptr (Offset $ offset + 32)
 addptr :: Ptr -> Signed 32 -> Ptr
 addptr (Ptr (Offset offset)) x = Ptr (Offset $ offset + (fromIntegral . toInteger $ x))
 
-programmedRAM :: (KnownNat n, KnownNat m, (n + m) ~ 1000) => Vec n Instruction -> RAM
+programmedRAM :: (KnownNat n, KnownNat m, (n + m) ~ 64) => Vec n Instruction -> RAM
 programmedRAM inst = RAM $ paddingEncodedInstruction (fmap encodeInstruction inst) (repeat (Word32 0))
 
 paddingEncodedInstruction ::
-  forall n m . (KnownNat n, KnownNat m, (n + m) ~ 1000)
+  forall n m . (KnownNat n, KnownNat m, (n + m) ~ 64)
     => Vec n Word32
     -> Vec m Word32
-    -> Vec 1000 Word32
+    -> Vec 64 Word32
 paddingEncodedInstruction inst zeroInst = inst ++ zeroInst
 
 -- Address
@@ -123,13 +124,13 @@ word8ToAddressL (Word8 signed8) = toList vec8bitvec1
 ramToAddress :: RAM -> Address
 ramToAddress (RAM ram) = Address $ convert ram
   where
-    ramBitVector :: Vec 1000 Word32 -> Vec 1000 (BitVector 32)
+    ramBitVector :: Vec 64 Word32 -> Vec 64 (BitVector 32)
     ramBitVector = fmap word32ToBitVector
-    bitVectorToVec :: Vec 1000 (BitVector 32) -> Vec 1000 (Vec 32 (BitVector 1))
+    bitVectorToVec :: Vec 64 (BitVector 32) -> Vec 64 (Vec 32 (BitVector 1))
     bitVectorToVec = fmap unconcatBitVector#
-    concatVecs :: Vec 1000 (Vec 32 (BitVector 1)) -> Vec 32000 (BitVector 1)
+    concatVecs :: Vec 64 (Vec 32 (BitVector 1)) -> Vec 2048 (BitVector 1)
     concatVecs = concat
-    convert :: Vec 1000 Word32 -> Vec 32000 (BitVector 1)
+    convert :: Vec 64 Word32 -> Vec 2048 (BitVector 1)
     convert = concatVecs . bitVectorToVec . ramBitVector
 
 addressToRAM :: Address -> RAM
@@ -142,9 +143,9 @@ addressToList (Address vector) = toList vector
 ramToAddressL :: RAM -> AddressL
 ramToAddressL = addressToList . ramToAddress
 
--- Reuire it's length is 32000
+-- Reuire it's length is 320000
 listToAddress :: AddressL -> Maybe Address
-listToAddress list = case (fromList list :: Maybe (Vec 32000 (BitVector 1))) of
+listToAddress list = case (fromList list :: Maybe (Vec 2048 (BitVector 1))) of
                           Just v  -> Just (Address v)
                           Nothing -> error $ "Cannot convert AddressL to Address"
 

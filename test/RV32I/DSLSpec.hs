@@ -75,32 +75,32 @@ spec = do
       DSL.srli S2 S1 2 `shouldBe` I (IShift SRLI (Word5 2) S1 S2)
   describe (unitTag <> "jalr") $ do
     it "check DSL 'jalr'" $ do
-      DSL.jalr S2 S1 2 `shouldBe` I (IJalr JALR (Word12 2) S1 S2)
+      DSL.jalr S2 2 S1 `shouldBe` I (IJalr JALR (Word12 2) S1 S2)
   describe (unitTag <> "lb") $ do
     it "check DSL 'lb'" $ do
-      DSL.lb S2 S1 2 `shouldBe` I (ILoad LB (Word12 2) S1 S2)
+      DSL.lb S2 2 S1 `shouldBe` I (ILoad LB (Word12 2) S1 S2)
   describe (unitTag <> "lh") $ do
     it "check DSL 'lh'" $ do
-      DSL.lh S2 S1 2 `shouldBe` I (ILoad LH (Word12 2) S1 S2)
+      DSL.lh S2 2 S1 `shouldBe` I (ILoad LH (Word12 2) S1 S2)
   describe (unitTag <> "lw") $ do
     it "check DSL 'lw'" $ do
-      DSL.lw S2 S1 2 `shouldBe` I (ILoad LW (Word12 2) S1 S2)
+      DSL.lw S2 2 S1 `shouldBe` I (ILoad LW (Word12 2) S1 S2)
   describe (unitTag <> "lbu") $ do
     it "check DSL 'lbu'" $ do
-      DSL.lbu S2 S1 2 `shouldBe` I (ILoad LBU (Word12 2) S1 S2)
+      DSL.lbu S2 2 S1 `shouldBe` I (ILoad LBU (Word12 2) S1 S2)
   describe (unitTag <> "lhu") $ do
     it "check DSL 'lhu'" $ do
-      DSL.lhu S2 S1 2 `shouldBe` I (ILoad LHU (Word12 2) S1 S2)
+      DSL.lhu S2 2 S1 `shouldBe` I (ILoad LHU (Word12 2) S1 S2)
   -- S-Type Format
   describe (unitTag <> "sb") $ do
     it "check DSL 'sb'" $ do
-      DSL.sb S2 S1 900 `shouldBe` S (SStore SB (Word7 28) S2 S1 (Word5 4))
+      DSL.sb S2 900 S1 `shouldBe` S (SStore SB (Word7 28) S2 S1 (Word5 4))
   describe (unitTag <> "sh") $ do
     it "check DSL 'sh'" $ do
-      DSL.sh S2 S1 900 `shouldBe` S (SStore SH (Word7 28) S2 S1 (Word5 4))
+      DSL.sh S2 900 S1 `shouldBe` S (SStore SH (Word7 28) S2 S1 (Word5 4))
   describe (unitTag <> "sw") $ do
     it "check DSL 'sw'" $ do
-      DSL.sw S2 S1 900 `shouldBe` S (SStore SW (Word7 28) S2 S1 (Word5 4))
+      DSL.sw S2 900 S1 `shouldBe` S (SStore SW (Word7 28) S2 S1 (Word5 4))
   -- B-Type Format
   describe (unitTag <> "beq") $ do
     it "check DSL 'beq'" $ do
