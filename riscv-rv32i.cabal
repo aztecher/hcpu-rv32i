@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 109bfe16dbeb674ce978fd1bfc42d395f8d862cdc3ca52f4044b1ec96756f3da
+-- hash: 8d9ca52bcbf68554b72ac95aaebb332e461860178af4cf3b551c855e3c71eb2a
 
 name:           riscv-rv32i
 version:        0.1.0.0
@@ -116,6 +116,7 @@ test-suite riscv-rv32i-test
       RV32I.Programs.ExampleSpec
       RV32I.RAMSpec
       RV32I.RegisterSpec
+      RV32I.WordSpec
       TestUtils.Common
       TestUtils.Program
       Paths_riscv_rv32i

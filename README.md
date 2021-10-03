@@ -72,7 +72,7 @@ However, some instruction sets, s.t. FENCE, FENCEI, ... are not implemented yet.
 * [x] Add Test
 * [x] Refactor Codes
 * [x] Consider relation between `Vec n Instruction` and address space
-* [ ] Create fibonacci function and check it's execution
+* [x] Create fibonacci function and check it's execution
 * [ ] Check working on compiled Verilog-HDL
 * [ ] Check working on FPGA
 
@@ -89,3 +89,6 @@ For example, If you want to run `addImm` program in [Example.hs](./src/RV32I/Pro
 ```
 
 [`sample`](https://hackage.haskell.org/package/clash-prelude-0.99.3/docs/Clash-Signal-Internal.html#v:sample) function generates infinit list of result of CPU execution, and `addImm` code will loop by jumping same addresss, so you take some length from this.
+
+
+You can see the 'fibonacci program' in [src/RV32I/Programs/Fib.hs](./src/RV32I/Programs/Fib.hs) as a more complex example.  

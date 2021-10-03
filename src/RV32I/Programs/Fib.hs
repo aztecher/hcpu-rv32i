@@ -58,44 +58,45 @@ import Clash.Sized.Vector (Vec((:>), Nil))
 --    101cc:       fea42623                sw      a0,-20(s0)
 --    101d0:       0000006f                j       101d0 <main+0x1c>
 
-fibonacci =
+
+fibonacci n =
      addi SP SP (-32)  -- pc = 0
-  :> sw   RA 28 SP     -- pc = 32
-  :> sw   S0 24 SP     -- pc = 64
-  :> sw   S1 20 SP     -- pc = 96
-  :> addi S0 SP 32     -- pc = 128
-  :> sw   A0 (-20) S0  -- pc = 160
-  :> lw   A4 (-20) S0  -- pc = 192
-  :> li   A5 1         -- pc = 224
-  :> blt  A5 A4 96     -- pc = 256 / if True then jamp to pc=352
-  :> li   A5 1         -- pc = 288
-  :> j    384          -- pc = 320 / jamp to pc=704
-  :> lw   A5 (-20) S0  -- pc = 352
-  :> addi A5 A5 (-1)   -- pc = 384
-  :> mv   A0 A5        -- pc = 416
-  :> jal  RA (-448)    -- pc = 448 / return to fib first
-  :> mv   S1 A0        -- pc = 480
-  :> lw   A5 (-20) S0  -- pc = 512
-  :> addi A5 A5 (-2)   -- pc = 554
-  :> mv   A0 A5        -- pc = 576
-  :> jal  RA (-608)    -- pc = 608 / return to fib first
-  :> mv   A5 A0        -- pc = 640
-  :> add  A5 S1 A5     -- pc = 672
-  :> mv   A0 A5        -- pc = 704
-  :> lw   RA 28 SP     -- pc = 736
-  :> lw   S0 24 SP     -- pc = 768
-  :> lw   S1 20 SP     -- pc = 800
-  :> addi SP SP 32     -- pc = 832
-  :> ret               -- pc = 864
+  :> sw   RA 28 SP     -- pc = 4
+  :> sw   S0 24 SP     -- pc = 8
+  :> sw   S1 20 SP     -- pc = 12
+  :> addi S0 SP 32     -- pc = 16
+  :> sw   A0 (-20) S0  -- pc = 20
+  :> lw   A4 (-20) S0  -- pc = 24
+  :> li   A5 1         -- pc = 28
+  :> blt  A5 A4 12     -- pc = 32 / if True then jamp to pc=44
+  :> li   A5 1         -- pc = 36
+  :> j    48           -- pc = 40 / jamp to pc=88
+  :> lw   A5 (-20) S0  -- pc = 44
+  :> addi A5 A5 (-1)   -- pc = 48
+  :> mv   A0 A5        -- pc = 52
+  :> jal  RA (-56)     -- pc = 56 / return to fib first
+  :> mv   S1 A0        -- pc = 60
+  :> lw   A5 (-20) S0  -- pc = 64
+  :> addi A5 A5 (-2)   -- pc = 68
+  :> mv   A0 A5        -- pc = 72
+  :> jal  RA (-76)     -- pc = 76 / return to fib first
+  :> mv   A5 A0        -- pc = 80
+  :> add  A5 S1 A5     -- pc = 84
+  :> mv   A0 A5        -- pc = 88
+  :> lw   RA 28 SP     -- pc = 92
+  :> lw   S0 24 SP     -- pc = 96
+  :> lw   S1 20 SP     -- pc = 100
+  :> addi SP SP 32     -- pc = 104
+  :> ret               -- pc = 108
   -- start main function
-  :> addi SP SP 2016  -- pc = 896 / program data are located in 'Highest address - offset'
-  :> addi SP SP (-32 * 4)  -- pc = 928
-  :> sw   RA 28  SP    -- pc = 960
-  :> sw   S0 24  SP    -- pc = 992
-  :> addi S0 SP 32     -- pc = 1024
-  :> li   A0 3         -- pc = 1056 / fib(n=3) of n
-  :> jal  RA (-1088)   -- pc = 1088 / jamp to Fibonacci
-  :> j 0               -- pc = 1120 / jamp here and loop
+  :> addi SP SP 2016
+  :> addi SP SP (-32)  -- pc = 116
+  :> sw   RA 28  SP    -- pc = 120
+  :> sw   S0 24  SP    -- pc = 124
+  :> addi S0 SP 32     -- pc = 128
+  :> li   A0 n        -- pc = 132 / n of fib(n=10)
+  :> jal  RA (-136)    -- pc = 136 / jamp to Fibonacci
+  :> j 0               -- pc = 140 / jamp here and loop
   :> Nil
   where
     -- Pseudo instructions
@@ -104,3 +105,42 @@ fibonacci =
     j  offset = jal Zero offset
     ret       = jalr Zero 0 RA
 
+-- Example) fib(10) = 89 (this example takes too many time, but calculation success!)
+-- λ > :m + Text.Pretty.Simple
+-- λ > runCPU inst = Prelude.take 20000 $ sample (cpu (zeroRegisterCPU (Ptr  112)) (programmedRAM inst) :: Signal System Registers)
+-- λ > pPrint $ Prelude.last $ runCPU (fibonacci 10)
+-- Registers
+--     { zero = 144
+--     , ra = 140
+--     , sp = 1984
+--     , gp = 0
+--     , tp = 0
+--     , t0 = 0
+--     , t1 = 0
+--     , t2 = 0
+--     , s0fp = 2016
+--     , s1 = 0
+--     , a0 = 89
+--     , a1 = 0
+--     , a2 = 0
+--     , a3 = 0
+--     , a4 = 0
+--     , a5 = 89
+--     , a6 = 0
+--     , a7 = 0
+--     , s2 = 0
+--     , s3 = 0
+--     , s4 = 0
+--     , s5 = 0
+--     , s6 = 0
+--     , s7 = 0
+--     , s8 = 0
+--     , s9 = 0
+--     , s10 = 0
+--     , s11 = 0
+--     , t3 = 0
+--     , t4 = 0
+--     , t5 = 0
+--     , t6 = 0
+--     , pc = Ptr 140
+--     }

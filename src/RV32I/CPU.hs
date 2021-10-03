@@ -292,9 +292,8 @@ cycle (CPUState activity registers, ram) = case activity of
           where
             Ptr cur = pc registers
             Ptr naddr = increment (pc registers)
-            registers' = writeRegister registers rd (offsetToSigned32 naddr)
-            -- not replace , mask
-            pc' = Ptr $ signed32ToOffset $ unpack $
+            registers' = writeRegister registers rd naddr
+            pc' = Ptr $ unpack $
               replaceBit#
                 (pack (readRegister registers rs1 + resize offset))
                 0
@@ -305,19 +304,19 @@ cycle (CPUState activity registers, ram) = case activity of
       ILoad load (Word12 offset) rs1 rd -> case load of
         LB  -> (CPUState IncrementProgramCounter registers', ram)
           where
-            ptr = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr = Ptr $ readRegister registers rs1 + resize offset
             Word8 value = readRAM1Byte ram ptr
             result = resize value
             registers' = writeRegister registers rd result
         LH  -> (CPUState IncrementProgramCounter registers', ram)
           where
-            ptr = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr = Ptr $ readRegister registers rs1 + resize offset
             Word16 value = readRAM2Byte ram ptr
             result = resize value
             registers' = writeRegister registers rd result
         LW  -> (CPUState IncrementProgramCounter registers', ram)
           where
-            ptr = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr = Ptr $ readRegister registers rs1 + resize offset
             Word32 value = readRAM4Byte ram ptr
             result = resize value
             registers' = writeRegister registers rd result
@@ -325,7 +324,7 @@ cycle (CPUState activity registers, ram) = case activity of
           where
             zeroExpand :: Signed 8 -> Signed 32
             zeroExpand num = unpack $ (0 :: BitVector 24) ++# (pack num)
-            ptr = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr = Ptr $ readRegister registers rs1 + resize offset
             Word8 value = readRAM1Byte ram ptr
             result = zeroExpand value
             registers' = writeRegister registers rd result
@@ -333,7 +332,7 @@ cycle (CPUState activity registers, ram) = case activity of
             where
               zeroExpand :: Signed 16 -> Signed 32
               zeroExpand num = unpack $ (0 :: BitVector 16) ++# (pack num)
-              ptr = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+              ptr = Ptr $ readRegister registers rs1 + resize offset
               Word16 value = readRAM2Byte ram ptr
               result = zeroExpand value
               registers' = writeRegister registers rd result
@@ -357,24 +356,23 @@ cycle (CPUState activity registers, ram) = case activity of
         SB -> (CPUState IncrementProgramCounter registers, ram')
           where
             offset = unpack $ pack offset1 ++# pack offset2
-            ptr    = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr    = Ptr $ readRegister registers rs1 + resize offset
             value  = Word8 $ resize $ readRegister registers rs2
             ram'   = writeRAM1Byte ram ptr value
         SH -> (CPUState IncrementProgramCounter registers, ram')
           where
             offset = unpack $ pack offset1 ++# pack offset2
-            ptr    = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr    = Ptr $ readRegister registers rs1 + resize offset
             value  = Word16 $ resize $ readRegister registers rs2
             ram'   = writeRAM2Byte ram ptr value
         SW -> (CPUState IncrementProgramCounter registers, ram')
           where
             offset = unpack $ pack offset1 ++# pack offset2
-            ptr    = Ptr $ signed32ToOffset $ readRegister registers rs1 + resize offset
+            ptr    = Ptr $ readRegister registers rs1 + resize offset
             value  = Word32 $ readRegister registers rs2
             ram'   = writeRAM4Byte ram ptr value
     B format -> case format of
       BBranch br (Word7 offset1) rs2 rs1 (Word5 offset2) -> case br of
-        -- BEQ -> (CPUState nActivity registers', ram)
         BEQ -> (nextstate, ram)
           where
             offset  = unpack (bformat_offset offset1 offset2)
@@ -479,7 +477,7 @@ cycle (CPUState activity registers, ram) = case activity of
           where
             shifted = unpack $ shiftL# (resize $ pack im20) 12
             Ptr ad  = pc registers
-            result  = shifted + (offsetToSigned32 ad)
+            result  = shifted + ad
             registers' = writeRegister registers rd result
     J format -> case format of
       JJal jal (Word20 offset) rd -> case jal of
@@ -487,9 +485,8 @@ cycle (CPUState activity registers, ram) = case activity of
           where
             Ptr curr = pc registers
             Ptr naddr = increment (pc registers)
-            registers' = writeRegister registers rd (offsetToSigned32 naddr)
-            pc' = Ptr $ signed32ToOffset $ (offsetToSigned32 curr) + (resize offset)
-            -- Check
+            registers' = writeRegister registers rd naddr
+            pc' = Ptr $ (curr + (resize offset))
             registers'' = registers' { pc = pc' }
             nLoadedWord = readRAM ram (pc registers'')
             nActivity = ExecutingInstruction (decodeInstruction nLoadedWord)
@@ -523,176 +520,19 @@ cpuHardware initialCPUState initialRAM = resultSignal
     resultSignal = fmap execute systemState'
 
 initCPUState :: CPUState
-initCPUState = zeroRegisterCPU (Ptr . Offset $ 0)
+initCPUState = zeroRegisterCPU (Ptr 0)
 
 zeroRegisterCPU :: Ptr -> CPUState
 zeroRegisterCPU ptr = CPUState LoadingInstruction (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ptr)
 
--- TODO
--- Address calculationなど含めスプレッドシートに記載したので必要によっては確認されたし
-fibonacciProgram = fibProgram
-  where
-    s_slice7 :: Signed 12 -> Signed 7
-    s_slice7 num = unpack (slice Nat.d11 Nat.d5 (pack num))
-    s_slice5 :: Signed 12 -> Signed 5
-    s_slice5 num = unpack (slice Nat.d4 Nat.d0 (pack num))
-    b_slice12 :: Signed 13 -> Signed 1
-    b_slice12 num = unpack (slice Nat.d12 Nat.d12 (pack num))
-    b_slice11 :: Signed 13 -> Signed 1
-    b_slice11 num = unpack (slice Nat.d11 Nat.d11 (pack num))
-    b_slice10_5 :: Signed 13 -> Signed 6
-    b_slice10_5 num = unpack (slice Nat.d10 Nat.d5 (pack num))
-    b_slice4_1 :: Signed 13 -> Signed 4
-    b_slice4_1 num = unpack (slice Nat.d4 Nat.d1 (pack num))
-    b_offset_12_10_5 :: Signed 13 -> Signed 7
-    b_offset_12_10_5 num = unpack $ (pack (b_slice12 num)) ++# (pack (b_slice10_5 num))
-    b_offset_4_1_11 :: Signed 13 -> Signed 5
-    b_offset_4_1_11 num = unpack $ (pack (b_slice4_1 num)) ++# (pack (b_slice11 num))
-    -- Helper functions to convert binary instruction to RISC-V instruction format
-    addi rd  rs1    imm = I (IArith ADDI (Word12 imm) rs1 rd)
-    add  rd  rs1    rs2 = R (RArith ADD rs2 rs1 rd)
-    sw   rs2 offset rs1 = S (SStore SW (Word7 (s_slice7 (offset :: Signed 12))) rs2 rs1 (Word5 (s_slice5 (offset :: Signed 12))))
-    lw   rd  offset rs1 = I (ILoad LW (Word12 (offset :: Signed 12)) rs1 rd)
-    li   rd  imm        = addi rd T6 imm
-    blt  rs1 rs2 offset = B (BBranch BLT (Word7 (b_offset_12_10_5 offset)) rs2 rs1 (Word5 (b_offset_4_1_11 offset)))
-    mv   rd  rs1        = addi rd rs1 0
-    jal  rd  offset     = J (JJal JAL (Word20 offset) rd)
-    jalr rd  offset rs1 = I (IJalr JALR (Word12 offset) rs1 rd)
-    -- j    offset         = jal Zero offset
-    j    offset         = jal Zero offset
-    ret                 = jalr Zero 1 RA -- TODO: Check / 1ずれる? -> address problem (want to 17 -> go to 16)
-    -- Fib Program
-    -- > ちょっとおかしいかもしれない。確認jmp周り
-    fibProgram =
-      -- start Fibonacci function from here
-         addi SP SP (-10) -- pc = 1
-      :> sw   RA 1  SP
-      :> sw   S0 2  SP
-      :> sw   S1 3  SP
-      :> addi S0 SP 10
-      :> sw   A0 (-1) S0
-      :> lw   A4 (-1) S0
-      :> li   A5 1
-      :> blt  A5 A4 4
-      :> addi T6 T6 0 -- pc = 10( thunk because of Bformat even)
-      :> li   A5 1
-      :> j    26
-      :> lw   A5 (-1) S0 -- pc = 13 / Case: blt A5 < A4
-      :> addi A5 A5 (-1)
-      :> mv   A0 A5
-      :> jal  RA 1
-      :> addi T6 T6 0 -- pc = 17( thunk because of Bformat even)
-      :> mv   S1 A0 -- pc = 18
-      :> lw   A5 (-1) S0
-      :> addi A5 A5 (-2)
-      :> addi T6 T6 0 -- pc = 21( thunk because of Bformat even)
-      :> mv   A0 A5 -- pc = 22
-      :> jal  RA 1
-      :> mv   A5 A0 -- pc = 24
-      :> add  A5 S1 A5
-      :> mv   A0 A5 -- pc = 26
-      :> lw   RA 1 SP
-      :> lw   S0 2 SP
-      :> lw   S1 3 SP
-      :> addi SP SP 10
-      :> ret          -- pc = 31
-      -- start main function
-      :> addi SP SP 1000 -- PC 32 (= from init Ptr 31)
-      :> addi SP SP (-10)
-      :> sw   RA 1  SP -- Need to Debug (MEMORY ADDRESS)
-      :> sw   S0 2  SP
-      :> addi S0 SP 10
-      :> li   A0 3 -- fib(n=10)
-      :> jal  RA 1 -- jamp to Fibonacci
-      :> j 37  -- jamp here
-      :> Nil
+-- programMem = fmap encodeInstruction fibonacciProgram
 
-    -- myProgram =
-    --      I (IArith ADDI (Word12 10)  Zero A0)
-    --   -- TODO: required to change s0 to sp
-    --   :> I (IArith ADDI (Word12 100) Zero S0) -- 32 -> 100 because of the memory (conflict the instruction and saved data)
-    --   -- TODO: S0 -> SP is required?
-    --   :> S (SStore SW (Word7 (s_slice7 (0   :: Signed 12))) RA   S0 (Word5 (s_slice5 (0   :: Signed 12))))
-    --   :> S (SStore SW (Word7 (s_slice7 (-4  :: Signed 12))) S0 S0 (Word5 (s_slice5 (-4  :: Signed 12))))
-    --   :> S (SStore SW (Word7 (s_slice7 (-8  :: Signed 12))) S1   S0 (Word5 (s_slice5 (-8  :: Signed 12))))
-    --   :> S (SStore SW (Word7 (s_slice7 (-12 :: Signed 12))) A0   S0 (Word5 (s_slice5 (-12 :: Signed 12))))
-    --   :> I (ILoad  LW (Word12 (-12 :: Signed 12)) S0 A4)
-    --   :> I (IArith ADDI (Word12 1) Zero A5)
-    --   :> B (BBranch BLT (Word7 (b_offset_12_10_5 3)) A4 A5 (Word5 (b_offset_4_1_11 3)))
-    --   :> I (IArith ADDI (Word12 1) Zero A5)
-    --   :> J (JJal JAL (Word20 22) S10)
-    --   -- fib(n-1) branch
-    --   :> I (ILoad LW (Word12 (-12 :: Signed 12)) S0 A5) -- start to calculate fib(n-1)
-    --   :> I (IArith ADDI (Word12 (-1 :: Signed 12)) A5 A5)
-    --   :> I (IArith ADDI (Word12 0) A5 A0)
-    --   :> J (JJal JAL (Word20 1) RA) -- loop fibonacci RA=15, pc=1
-    --   :> I (IArith ADDI (Word12 0) A0 S1) -- store the result of fib(n-1) to s1
-    --   -- fib(n-2) branch
-    --   :> I (ILoad LW (Word12 (-20 :: Signed 12)) S0 A5) -- start to calculate fib(n-2)
-    --   :> I (IArith ADDI (Word12 (-2 :: Signed 12)) A5 A5)
-    --   :> I (IArith ADDI (Word12 0) A5 A0)
-    --   :> J (JJal JAL (Word20 1) RA) -- loop fibonacci
-    --   :> I (IArith ADDI (Word12 0) A0 A5) -- load the value of A0 to A5
-    --   :> R (RArith ADD A5 S1 A5) -- calculate A5(=fib(n-2)) + S1(=fib(n-1)) and store it to A5
-    --   :> I (IArith ADDI (Word12 0) A5 A0) -- copy the result of A5 to A0
-    --   -- TODO: required to change sp
-    --   :> I (ILoad LW (Word12 (0 :: Signed 12)) S0 RA)
-    --   :> I (ILoad LW (Word12 (-4 :: Signed 12)) S0 S0)
-    --   :> I (ILoad LW (Word12 (-8 :: Signed 12)) S0 S1)
-    --   :> I (IArith ADDI (Word12 100) S0 S0)
-    --   :> I (IJalr JALR (Word12 0) RA Zero) -- Ret represents JALR
-    --   :> J (JJal JAL (Word20 28) S11)
-    --   :> Nil
-    -- -- TODO: reference sample program
-    -- program =
-    --   -- TODO: UArith is wrong? -> write as Addi above
-    --   -- -- 関数呼び出しに伴うStack Pointer周りの動きになるので一旦ここでは省略
-    --   --    I (IArith ADDI (Word12 (-32 :: Signed 12)) SP SP)                                                 -- addi  sp,sp,-32
-    --   -- :> S (SStore SW (Word7 (s_slice7 28)) RA SP (Word5 (s_slice5 28)))                                   -- sw    ra,28(sp) X+Y=28 28 :: Signed 12 -> partition
-    --   -- :> S (SStore SW (Word7 (s_slice7 24)) S0 SP (Word5 (s_slice5 24)))                                 -- sw    s0,24(sp) X+Y=24
-    --   -- :> I (IArith ADDI (Word12 32) SP S0)                                                               -- addi  s0,sp,32
-    --      U (UArith LUI (Word20 10) A0)                                                                     -- li    a0,10 (-> lui a0,10)
-    --   -- :> J (JJal JAL (Word20 10144) RA)                                                                 -- jal   ra,10144 (=> fib call -> hardcode)
-    --   -- fib function hardcode start >>>>>>>>>>>>
-    --   -- TODO: いくつか処理を落とす必要があるかも
-    --   -- :> I (IArith ADDI (Word12 (-32 :: Signed 12)) SP SP)                                                 -- addi  sp,sp,-32
-    --   :> S (SStore SW (Word7 (s_slice7 0)) RA SP (Word5 (s_slice5 28)))                                   -- sw    ra,28(sp)
-    --   :> S (SStore SW (Word7 (s_slice7 4)) S0 SP (Word5 (s_slice5 24)))                                 -- sw    s0,24(sp) X+Y=24
-    --   :> S (SStore SW (Word7 (s_slice7 20)) S1 SP (Word5 (s_slice5 20)))                                   -- sw    s1,20(sp) X+Y=20
-    --   :> I (IArith ADDI (Word12 32) S0 SP)                                                               -- addi  s0,sp,32
-    --   :> S (SStore SW (Word7 (s_slice7 (-20 :: Signed 12))) A0 S0 (Word5 (s_slice5 (-20 :: Signed 12)))) -- sw    a0,-20(s0) X+Y=-20
-    --   :> I (ILoad  LW (Word12 (-20 :: Signed 12)) S0 A4)                                                 -- lw    a4,-20(s0)
-    --   :> U (UArith LUI (Word20 1) A5)                                                                      -- li    a5,1 (-> lui/addiに展開される。ここではluiを選択)
-    --   :> B (BBranch BLT (Word7 (b_offset_12_10_5 16)) A4 A5 (Word5 (b_offset_4_1_11 16)))                  -- blt   a5,a4,10170 X+Y=10170 (10170はfibの計算途中のアドレス) => a5,a4,16
-    --   :> U (UArith LUI (Word20 1) A5)                                                                      -- li    a5,1
-    --   :> J (JJal JAL (Word20 27) Zero)                                                                     -- j     1019c (-> jal x0,1019cに展開される / 1019cはfibの再帰終了の流れのaddress) => j 27
-    --   :> I (ILoad LW (Word12 (-20 :: Signed 12)) S0 A5)                                                  -- lw    a5,-20(s0)
-    --   :> I (IArith ADDI (Word12 (-1 :: Signed 12)) A5 A5)                                                  -- addi  a5,a5,-1
-    --   :> I (IArith ADDI (Word12 0) A5 A0)                                                                  -- mv    a0,a5 (-> addi a0,a5,0)
-    --   :> J (JJal JAL (Word20 5) RA)                                                                        -- jal   ra,10144 (=> 10144 = fibonacci関数の先頭) => ra,5
-    --   :> I (IArith ADDI (Word12 0) A0 S1)                                                                  -- mv    s1,a0
-    --   :> I (ILoad LW (Word12 (-20 :: Signed 12)) S0 A5)                                                  -- lw    a5,-20(s0)
-    --   :> I (IArith ADDI (Word12 (-2 :: Signed 12)) A5 A5)                                                  -- addi  a5,a5,-2
-    --   :> I (IArith ADDI (Word12 0) A5 A0)                                                                  -- mv    a0,a5 (-> addi a0,a5,0)
-    --   :> J (JJal JAL (Word20 5) RA)                                                                        -- jal   ra,10144 => jal ra,5
-    --   :> I (IArith ADDI (Word12 0) A0 A5)                                                                  -- mv    a5,a0 (-> addi a5,a0,0)
-    --   :> R (RArith ADD A5 S1 A5)                                                                           -- add   a5,s1,a5
-    --   :> I (IArith ADDI (Word12 0) A5 A0)                                                                  -- mv    a0,a5 (-> addi a0,a5,0)
-    --   :> I (ILoad LW (Word12 28) SP RA)                                                                    -- lw    ra,28(sp)
-    --   :> I (ILoad LW (Word12 24) SP S0)                                                                  -- lw    s0,24(sp)
-    --   :> I (ILoad LW (Word12 20) SP S1)                                                                    -- lw    s1,20(sp)
-    --   :> I (IArith ADDI (Word12 32) SP SP)                                                                 -- addi  sp,sp,32
-    --   -- :> I (IJalr JALR (Word12 0) RA Zero                                                               -- ret   (-> jalr x0 0(x1)に展開される) -- 今回returnはない
-    --   -- :> Nil
-    --   -- <<<<<<<<<<<<< fib function hardcode stop
-    --   :> S (SStore SW (Word7 (s_slice7 (-20 :: Signed 12))) A0 S0 (Word5 (s_slice5 (-20 :: Signed 12)))) -- sw    a0,-20(s0) X+Y=-20
-    --   :> J (JJal JAL (Word20 33) Zero)                                                                     -- j     101d0 (-> jal x0,101d0 に展開される/自身へのループなのでアドレス変更) => 33
-    --   :> Nil
+-- programCpu :: HiddenClockResetEnable dom => Signal dom Registers
+-- programCpu = cpuHardware (zeroRegisterCPU (Ptr (Offset $ 32 * 32))) (RAM (programMem ++ repeat (Word32 0)))
 
-programMem = fmap encodeInstruction fibonacciProgram
+-- programCpu :: HiddenClockResetEnable dom => Signal dom Registers
+-- programCpu = cpuHardware (zeroRegisterCPU (Ptr (Offset $ 32 * 32))) (RAM (programMem ++ repeat (Word32 0)))
 
-programCpu :: HiddenClockResetEnable dom => Signal dom Registers
-programCpu = cpuHardware (zeroRegisterCPU (Ptr (Offset $ 32 * 32))) (RAM (programMem ++ repeat (Word32 0)))
 
 -- You can play code in RV32I.RV32I.Programs.Example like follow
 -- >>> Prelude.take 10 $ sample (cpu initCPUState (programmedRAM addImm) :: Signal System Registers)
@@ -700,13 +540,12 @@ cpu :: HiddenClockResetEnable dom => CPUState -> RAM -> Signal dom Registers
 cpu = cpuHardware
 
 
-programResult :: [Registers]
-programResult = take 100 $ sample (programCpu :: Signal System Registers)
-
-programOutput :: IO ()
-programOutput = mapM_ print programResult
+-- programResult :: [Registers]
+-- programResult = take 100 $ sample (programCpu :: Signal System Registers)
+--
+-- programOutput :: IO ()
+-- programOutput = mapM_ print programResult
 
 
 takeInstruction inst n = pPrint $ Prelude.take n $ sample (cpu initCPUState (programmedRAM inst) :: Signal System Registers)
-
 testInst inst = takeInstruction inst 50

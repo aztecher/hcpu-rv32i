@@ -21,7 +21,6 @@ obviously :: [Int] -> Bool
 obviously _ = True
 
 -- helper functions for unit test
-
 propTag :: String
 propTag = "[PROP] "
 
@@ -31,10 +30,10 @@ unitTag = "[Unit] "
 
 -- helper functions for property-based-testing
 zeroRAM :: RAM
-zeroRAM = (RAM (repeat (Word32 0)))
+zeroRAM = (RAM (repeat (Word8 0)))
 
 zeroRegisters :: Registers
-zeroRegisters = (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (Ptr . Offset $ 0))
+zeroRegisters = (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 (Ptr 0))
 
 
 instance Arbitrary Register where
@@ -206,25 +205,12 @@ instance Arbitrary Instruction where
         (J jformat)
       ]
 
-instance Arbitrary Address where
-  arbitrary = do
-    vec <- arbitrary :: Gen (Vec 32000 (BitVector 1))
-    return $ Address vec
-
-instance {-# OVERLAPPING #-} Arbitrary AddressL where
-  arbitrary = vectorOf 32000 (arbitrary :: Gen (BitVector 1))
-
 instance Arbitrary RAM where
   arbitrary = do
-    vec <- arbitrary :: Gen (Vec 1000 Word32)
+    vec <- arbitrary :: Gen (Vec 2048 Word8)
     return $ RAM vec
-
-instance Arbitrary Offset where
-  arbitrary = do
-    gen <- QC.choose (0 :: Int, 67108863)
-    return $ Offset (32 * gen)
 
 instance Arbitrary Ptr where
   arbitrary = do
     gen <- QC.choose (-2147483648 :: Integer, 2147483647)
-    return $ Ptr . Offset $ (fromIntegral gen :: Int)
+    return $ Ptr (fromIntegral gen :: Signed 32)

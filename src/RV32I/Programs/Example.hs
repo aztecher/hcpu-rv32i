@@ -193,12 +193,9 @@ srliMinusShift =
     :> J (JJal JAL (Word20 0) S3)
     :> Nil
 
--- pc = S1(1) + offset(1) = 2 = 0010
--- rd = 2(pc of JALR) + 1 (next inst) = 3
 jalr =
-  I (IArith ADDI (Word12 32) Zero S1)
+  I (IArith ADDI (Word12 4) Zero S1)
     :> I (IJalr JALR (Word12 0) S1 S2)
-    -- :> I (IJalr JALR (Word12 32) S1 S2)
     :> Nil
 
 -- Test SLTI lt
@@ -381,7 +378,7 @@ beq =
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 64
+    offset = 8
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BEQ not equal pattern
@@ -394,7 +391,7 @@ beqNg =
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 64
+    offset = 8
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BNE not equal pattern
@@ -407,7 +404,7 @@ bne =
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 64
+    offset = 8
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BNE equal pattern
@@ -420,7 +417,7 @@ bneNg =
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 64
+    offset = 8
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BLT lt case of plus pattern
@@ -429,11 +426,11 @@ bltLtPlus =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLT offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 
@@ -443,11 +440,11 @@ bltLtMinus =
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BLT geq case of plus pattern
@@ -456,11 +453,11 @@ bltGeqPlus =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BLT geq case of minus pattern
@@ -469,11 +466,11 @@ bltGeqMinus =
     :> I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S2)
     :> B (BBranch BLT (offset7) S2 S1 (offset5))
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGE ge case of plus pattern
@@ -482,11 +479,11 @@ bgeGePlus =
     :> I (IArith ADDI (Word12 1) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGE ge case of minus pattern
@@ -495,11 +492,11 @@ bgeGeMinus =
     :> I (IArith ADDI (Word12 (-2 :: Signed 12)) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGE lt case of plus pattern
@@ -508,11 +505,11 @@ bgeLtPlus =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGE lt case of minus pattern
@@ -521,11 +518,11 @@ bgeLtMinus =
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) Zero S2)
     :> B (BBranch BGE offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 
@@ -535,11 +532,11 @@ bltult =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLTU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BLTU ge case
@@ -548,11 +545,11 @@ bltuge =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BLTU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (-1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGEU ge
@@ -561,11 +558,11 @@ bgeuge =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGEU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-96 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-12 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test BGEU lt case
@@ -574,11 +571,11 @@ bgeult =
     :> I (IArith ADDI (Word12 2) Zero S2)
     :> B (BBranch BGEU offset7 S2 S1 offset5)
     :> I (IArith ADDI (Word12 (1 :: Signed 12)) S1 S1)
-    :> J (JJal JAL (Word20 (-64 :: Signed 20)) S3)
+    :> J (JJal JAL (Word20 (-8 :: Signed 20)) S3)
     :> J (JJal JAL (Word20 0) S4)
     :> Nil
   where
-    offset = 96
+    offset = 12
     (offset7, offset5) = _make_offsets_of_bfomrat offset
 
 -- Test LUI plus value
