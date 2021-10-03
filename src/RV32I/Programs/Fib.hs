@@ -4,7 +4,7 @@ import RV32I.DSL
 import RV32I.Register
 import Clash.Sized.Vector (Vec((:>), Nil))
 
--- 変換対象のコード（C)
+-- The code to be converted（C)
 -- int fib(int n) {
 --   if (n <= 1) {
 --     return 1;
@@ -18,7 +18,7 @@ import Clash.Sized.Vector (Vec((:>), Nil))
 --   return 0;
 -- }
 
--- rv32i 向けに build した結果 (assembly)
+-- The reuslt of building above code for RV32I (Assembly)
 -- 00010144 <fib>:
 --    10144:       fe010113                addi    sp,sp,-32
 --    10148:       00112e23                sw      ra,28(sp)
@@ -58,7 +58,7 @@ import Clash.Sized.Vector (Vec((:>), Nil))
 --    101cc:       fea42623                sw      a0,-20(s0)
 --    101d0:       0000006f                j       101d0 <main+0x1c>
 
-
+-- DSL codes that represents above assembly code
 fibonacci n =
      addi SP SP (-32)  -- pc = 0
   :> sw   RA 28 SP     -- pc = 4
