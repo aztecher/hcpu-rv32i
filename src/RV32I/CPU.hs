@@ -26,7 +26,7 @@ import Prelude
    undefined, take, fmap, otherwise, fromIntegral,
    Show, Eq, IO, Int, Bool(..))
 import GHC.Stack (HasCallStack)
-import Text.Pretty.Simple (pPrint)
+import GHC.TypeLits
 
 
 -- CPU State
@@ -525,27 +525,14 @@ initCPUState = zeroRegisterCPU (Ptr 0)
 zeroRegisterCPU :: Ptr -> CPUState
 zeroRegisterCPU ptr = CPUState LoadingInstruction (Registers 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ptr)
 
--- programMem = fmap encodeInstruction fibonacciProgram
-
--- programCpu :: HiddenClockResetEnable dom => Signal dom Registers
--- programCpu = cpuHardware (zeroRegisterCPU (Ptr (Offset $ 32 * 32))) (RAM (programMem ++ repeat (Word32 0)))
-
--- programCpu :: HiddenClockResetEnable dom => Signal dom Registers
--- programCpu = cpuHardware (zeroRegisterCPU (Ptr (Offset $ 32 * 32))) (RAM (programMem ++ repeat (Word32 0)))
-
-
 -- You can play code in RV32I.RV32I.Programs.Example like follow
 -- >>> Prelude.take 10 $ sample (cpu initCPUState (programmedRAM addImm) :: Signal System Registers)
 cpu :: HiddenClockResetEnable dom => CPUState -> RAM -> Signal dom Registers
 cpu = cpuHardware
 
-
--- programResult :: [Registers]
--- programResult = take 100 $ sample (programCpu :: Signal System Registers)
---
--- programOutput :: IO ()
--- programOutput = mapM_ print programResult
-
-
-takeInstruction inst n = pPrint $ Prelude.take n $ sample (cpu initCPUState (programmedRAM inst) :: Signal System Registers)
-testInst inst = takeInstruction inst 50
+-- runCPU' take 4 arguments s.t.
+--   inst: CPU instruction
+--   ptr : init program counter
+--   n   : number of execution result
+runCPU' inst ptr n = Prelude.take n $ sample (cpu (zeroRegisterCPU (Ptr ptr)) (programmedRAM inst) :: Signal System Registers)
+runCPU inst ptr = runCPU' inst ptr 2000
