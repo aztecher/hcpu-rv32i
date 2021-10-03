@@ -24,8 +24,13 @@ dependencies:
 - ghc-typelits-natnormalise
 - ghc-typelits-extra
 - ghc-typelits-knownnat
+- typelits-witnesses
 - clash-prelude
 - deepseq
+- hspec
+- HUnit
+- QuickCheck >= 2.14.2
+- pretty-simple
 
 default-extensions:
 - DataKinds
@@ -38,6 +43,10 @@ default-extensions:
 - ScopedTypeVariables
 - MonoLocalBinds
 - MagicHash
+- TypeOperators
+- TypeFamilies
+- GADTs
+- PolyKinds
 
 library:
   source-dirs: src

@@ -1,54 +1,94 @@
 # hcpu-rv32i
 
-Haskell + Clash で RISC-V 準拠のCPUを作成してみたい。
+hcpu-rv32i is a RISC-V RV32I compliant software CPU implementation using [Haskell](https://www.haskell.org/) + [Clash](https://clash-lang.org/)
 
-## TODO
 
-* [ ] 未実装の命令セットの実装
-	* [ ] JALR
+## Supported/Unsupported Instruction Sets
+
+hcpu-rv32 now support some basic instruction sets of RV32I.  
+However, some instruction sets, s.t. FENCE, FENCEI, ... are not implemented yet.  
+
+### Supported instruction sets
+
+* R-type Format
+	* [x] ADD
+	* [x] SUB
+	* [x] AND
+	* [x] OR
+	* [x] XOR
+	* [x] SLL
+	* [x] SRA
+	* [x] SRL
+	* [x] SLT
+	* [x] SLTU
+* I-type Format
+	* [x] ADDI
+	* [x] SLTI
+	* [x] SLTIU
+	* [x] XORI
+	* [x] ORI
+	* [x] ANDI
+	* [x] SLLI
+	* [x] SRAI
+	* [x] SRLI
+	* [x] JALR
+	* [x] LB
+	* [x] LH
+	* [x] LW
+	* [x] LBU
+	* [x] LHU
+* S-type Format
+	* [x] SB
+	* [x] SH
+	* [x] SW
+* B-type Format
+	* [x] BEQ
+	* [x] BNE
+	* [x] BLT
+	* [x] BGE
+	* [x] BLTU
+	* [x] BGEU
+* U-type Format
+	* [x] LUI
+	* [x] AUIPC
+* J-type Format
+	* [x] JAL
+
+### Unupported instruction sets (2021.09.24)
+
+* I-type Format
 	* [ ] FENCE
 	* [ ] FENCEI
+	* [ ] EBREAK
+	* [ ] ECALL
 	* [ ] CSRRC
 	* [ ] CSRRS
 	* [ ] CSRRW
 	* [ ] CSRRCI
 	* [ ] CSRRSI
 	* [ ] CSRRWI
-* [ ] 実装した命令セットの確認
-	* [ ] R-type Format
-		* [x] ADD
-	* [ ] I-type Format
-		* [x] ADDI
-	* [ ] S-type Format
-	* [ ] B-type Format
-	* [ ] U-type Format
-	* [ ] J-type Format
-* [ ] テストの記述
-* [ ] コードの整理（モジュール化など）
-* [ ] Verilog-HDLでの動作確認
-* [ ] FPGAでの動作確認
+
+## TODO
+* [x] Add Test
+* [x] Refactor Codes
+* [x] Consider relation between `Vec n Instruction` and address space
+* [x] Create fibonacci function and check it's execution
+* [ ] Check working on compiled Verilog-HDL
+* [ ] Check working on FPGA
 
 ## Usage
 
-現時点ではちゃんとまとまってないので、`ghci`から`simpleProgramOutput`関数を呼び出すと`simpleProgram`で定義されたアセンブリ命令が実行される。
-またこの命令も実際に実行すると停止が明確でないので、結果自体は出力されるものの、命令が終了していこうの結果出力も出力しようとして`Exception`が発生する。
+Now, you have to hardcode instruction that you want to execute.  
+Please check some example in [src/RV32I/Programs/Example.hs](./src/RV32I/Programs/Example.hs) and test codes.
 
-```
-# * simpleProgram
-# 各レジスタの初期状態は0にしてあるので、下記のような動作になる。
-# Line1 > 即値1 + X0の値0 = 1 をX1へ書き込み
-# Line2 > 即値2 + X0の値0 = 2 をX2へ書き込み
-# Line3 > X1 + X2 = 3 をX0へ書き込み
-simpleProgram :: Vec 3 Instruction
-simpleProgram = I (IArith ADDI (Word12 1) X0 X1) :>
-                I (IArith ADDI (Word12 2) X0 X2) :>
-                R (RArith ADD X1 X2 X0) :>
-                Nil
+For example, If you want to run `addImm` program in [Example.hs](./src/RV32I/Programs/Example.hs), you can execute it by GHCi like bellow.  
+
+```bash
+λ > Prelude.take 10 $ sample (cpu initCPUState (programmedRAM addImm) :: Signal System Registers)
+...
 ```
 
-```ghci
-$ stack ghci
-λ > simpleProgramOutput
-λ > simpleProgramOutput
-[(0,0,0),(0,0,0),(0,1,0),(0,1,0),(0,1,2),(0,1,2),(3,1,2),(3,1,2)*** Exception: /Users/mikiyaf/Documents/haskell/Clash/hcpu/riscv-rv32i/src/RV32I.hs:(463,39)-(475,2): Non-exhaustive patterns in case
-```
+[`sample`](https://hackage.haskell.org/package/clash-prelude-0.99.3/docs/Clash-Signal-Internal.html#v:sample) function generates infinit list of result of CPU execution, and `addImm` code will loop by jumping same addresss, so you take some length from this.
+
+
+You can see the 'fibonacci program' in [src/RV32I/Programs/Fib.hs](./src/RV32I/Programs/Fib.hs) as a more complex example.  

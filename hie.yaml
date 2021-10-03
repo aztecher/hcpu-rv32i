@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "riscv-rv32i:lib"
+
+    - path: "./app/Main.hs"
+      component: "riscv-rv32i:exe:riscv-rv32i-exe"
+
+    - path: "./app/Paths_riscv_rv32i.hs"
+      component: "riscv-rv32i:exe:riscv-rv32i-exe"
+
+    - path: "./test"
+      component: "riscv-rv32i:test:riscv-rv32i-test"

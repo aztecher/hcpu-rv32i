@@ -5,12 +5,82 @@
 
 packages:
 - completed:
-    hackage: clash-prelude-1.0.1@sha256:a1f3e0b959f39b9e620e18fdc7a8647ed91bd888db8d5b52b961e1f9c8fc5739,12526
+    hackage: clash-prelude-1.4.3@sha256:77605835edb8f29430b2065073545d8e88750c922ae15cf0d16dfd660f4a62a4,15932
     pantry-tree:
-      size: 9159
-      sha256: 56e6219588b1e6516861f2b343e9d3a3e375c8d36b664705602afe230a6d53b5
+      size: 11699
+      sha256: 6bac61e0d6556d96306910d5b82f50d2250a4106829e13ce3c6246b595e90134
   original:
-    hackage: clash-prelude-1.0.1
+    hackage: clash-prelude-1.4.3
+- completed:
+    hackage: ghc-typelits-extra-0.4.2@sha256:cc986554a4483e92795589dc02aa1e0bd41daf89b962c56c2a48ff2f66e88aeb,4887
+    pantry-tree:
+      size: 682
+      sha256: 41f2f081c329ef6855232f4a43200dc0a0ac9a98c04f3ee3bfb630ef83a79ddd
+  original:
+    hackage: ghc-typelits-extra-0.4.2@sha256:cc986554a4483e92795589dc02aa1e0bd41daf89b962c56c2a48ff2f66e88aeb,4887
+- completed:
+    hackage: ghc-typelits-knownnat-0.7.5@sha256:7d4c315c51ac2e1d5ab92634b87448de7d08f91dd06535f957344b386b49087f,4820
+    pantry-tree:
+      size: 602
+      sha256: 04fa6dad56db279d50a0464f9d5860c102efb7b3ee42604212b793c1a2f19543
+  original:
+    hackage: ghc-typelits-knownnat-0.7.5@sha256:7d4c315c51ac2e1d5ab92634b87448de7d08f91dd06535f957344b386b49087f,4820
+- completed:
+    hackage: ghc-typelits-natnormalise-0.7.4@sha256:e690d4bb22259c8ca56513bdd381b493791ca6565fd4e75b8107ba128e7324c0,3516
+    pantry-tree:
+      size: 609
+      sha256: a1cd3f9a9a08478f3736dbcfb9281c5cbb8c1d9f9f32900f0dd2960e666a363b
+  original:
+    hackage: ghc-typelits-natnormalise-0.7.4@sha256:e690d4bb22259c8ca56513bdd381b493791ca6565fd4e75b8107ba128e7324c0,3516
+- completed:
+    hackage: QuickCheck-2.14.2@sha256:4ce29211223d5e6620ebceba34a3ca9ccf1c10c0cf387d48aea45599222ee5aa,7736
+    pantry-tree:
+      size: 2315
+      sha256: 2fe423d0ed7cd64f0f165d708779f48814e66c4f181c568468134af55d86a5f8
+  original:
+    hackage: QuickCheck-2.14.2@sha256:4ce29211223d5e6620ebceba34a3ca9ccf1c10c0cf387d48aea45599222ee5aa,7736
+- completed:
+    hackage: random-1.2.0@sha256:30d72df4cc1d2fe2d445c88f0ee9d21965af7ce86660c43a6c32a6a1d90d51c9,6094
+    pantry-tree:
+      size: 1259
+      sha256: 92b5a834ba603ee4d006968a75847f4fd93a566b8a96e1b463b8229f8ce9961d
+  original:
+    hackage: random-1.2.0@sha256:30d72df4cc1d2fe2d445c88f0ee9d21965af7ce86660c43a6c32a6a1d90d51c9,6094
+- completed:
+    hackage: splitmix-0.1.0.3@sha256:fc3aae74c467f4b608050bef53aec17904a618731df9407e655d8f3bf8c32d5c,6049
+    pantry-tree:
+      size: 1400
+      sha256: 8290f921f41c3628a6c9871502e57fd1d25f5954967afbf4ed16717fd8d3656f
+  original:
+    hackage: splitmix-0.1.0.3@sha256:fc3aae74c467f4b608050bef53aec17904a618731df9407e655d8f3bf8c32d5c,6049
+- completed:
+    hackage: typelits-witnesses-0.4.0.0@sha256:1d7092ba98fdc33f4b413e04144eb3ead7b105f74b2998e3c74a8a0feee685a9,1985
+    pantry-tree:
+      size: 403
+      sha256: 2ee741f6bb4dba710e6449da335fdcf8940adb767798b29fdb8ae2606d22e0cb
+  original:
+    hackage: typelits-witnesses-0.4.0.0
+- completed:
+    hackage: arrows-0.4.4.2@sha256:a260222b766da922657e302aa7c0409451913e1e503798a47a213a61ba382460,1235
+    pantry-tree:
+      size: 1035
+      sha256: 153eac3a26d5922d3be968368125e5a31cc4347049732ef3a75920c4b9fda417
+  original:
+    hackage: arrows-0.4.4.2@sha256:a260222b766da922657e302aa7c0409451913e1e503798a47a213a61ba382460,1235
+- completed:
+    hackage: Stream-0.4.7.2@sha256:ed78165aa34c4e23dc53c9072f8715d414a585037f2145ea0eb2b38300354c53,1009
+    pantry-tree:
+      size: 207
+      sha256: 009fe33c4779bd1705a26f9b036f0996e9fc85df06418aec3dda967554e6ef83
+  original:
+    hackage: Stream-0.4.7.2@sha256:ed78165aa34c4e23dc53c9072f8715d414a585037f2145ea0eb2b38300354c53,1009
+- completed:
+    hackage: lazysmallcheck-0.6@sha256:dac7a1e4877681f1260309e863e896674dd6efc1159897b7945893e693f2a6bc,1696
+    pantry-tree:
+      size: 2008
+      sha256: aea6b83dd91703fd130d98ecfed88b8f16841b22990c837c8fde89f9f6cca809
+  original:
+    hackage: lazysmallcheck-0.6@sha256:dac7a1e4877681f1260309e863e896674dd6efc1159897b7945893e693f2a6bc,1696
 snapshots:
 - completed:
     size: 524164
