@@ -54,7 +54,7 @@ However, some instruction sets, s.t. FENCE, FENCEI, ... are not implemented yet.
 * J-type Format
 	* [x] JAL
 
-### Unupported instruction sets (2021.09.24)
+### Unsupported instruction sets (2021.10.03)
 
 * I-type Format
 	* [ ] FENCE
@@ -88,7 +88,12 @@ For example, If you want to run `addImm` program in [Example.hs](./src/RV32I/Pro
 ...
 ```
 
-[`sample`](https://hackage.haskell.org/package/clash-prelude-0.99.3/docs/Clash-Signal-Internal.html#v:sample) function generates infinit list of result of CPU execution, and `addImm` code will loop by jumping same addresss, so you take some length from this.
+or, you can use `runCPU'` helper function.
 
+```bash
+λ > runCPU' addImm 0 10
+```
+
+[`sample`](https://hackage.haskell.org/package/clash-prelude-0.99.3/docs/Clash-Signal-Internal.html#v:sample) function generates infinite list of result of CPU execution, and `addImm` code will loop by jumping same addresss, so you take some length from this.
 
 You can see the 'fibonacci program' in [src/RV32I/Programs/Fib.hs](./src/RV32I/Programs/Fib.hs) as a more complex example.  
