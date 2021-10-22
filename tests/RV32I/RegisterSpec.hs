@@ -6,6 +6,7 @@ import Clash.Sized.BitVector (BitVector)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
+import Prelude (map, (<>), ($), (==), (.), Bool(..))
 
 
 -- encode/decode from/to Register/BitVector5 will be satisfied identification.

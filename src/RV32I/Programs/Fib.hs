@@ -89,12 +89,12 @@ fibonacci n =
   :> addi SP SP 32     -- pc = 104
   :> ret               -- pc = 108
   -- start main function
-  :> addi SP SP 2016
+  :> addi SP SP 2016   -- pc = 112
   :> addi SP SP (-32)  -- pc = 116
   :> sw   RA 28  SP    -- pc = 120
   :> sw   S0 24  SP    -- pc = 124
   :> addi S0 SP 32     -- pc = 128
-  :> li   A0 n        -- pc = 132 / n of fib(n=10)
+  :> li   A0 n         -- pc = 132 / n of fib(n=10)
   :> jal  RA (-136)    -- pc = 136 / jamp to Fibonacci
   :> j 0               -- pc = 140 / jamp here and loop
   :> Nil

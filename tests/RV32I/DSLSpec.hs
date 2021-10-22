@@ -8,8 +8,8 @@ import RV32I.Instruction
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
-
 import TestUtils.Common as UtilCommon
+import Prelude (map, (<>), ($), (==), (.), Bool(..))
 
 spec :: Spec
 spec = do

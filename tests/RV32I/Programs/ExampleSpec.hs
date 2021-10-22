@@ -11,9 +11,10 @@ import RV32I.Programs.Example as Example
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
-
 import TestUtils.Common as UtilCommon
 import TestUtils.Program as UtilProgram
+import Prelude ((<>), ($))
+
 
 spec :: Spec
 spec = do

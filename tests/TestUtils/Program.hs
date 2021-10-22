@@ -7,6 +7,7 @@ import RV32I.CPU
 import Clash.Signal (Signal, System, sample)
 import Clash.Sized.Vector(Vec)
 import GHC.TypeLits
+import Prelude (take, last, ($))
 
 calculateDefaultSetup inst = calculateDefaultSetupWithN 100 inst
 
