@@ -6,6 +6,8 @@ import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
 import TestUtils.Common
+import Prelude (map, (<>), ($), (==), (.), Bool(..))
+
 
 concat_separate_word8_word32 :: [Word32] -> Bool
 concat_separate_word8_word32 xs

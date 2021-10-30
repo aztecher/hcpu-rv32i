@@ -9,8 +9,9 @@ import Clash.Class.BitPack (pack)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
-
 import TestUtils.Common
+import Prelude (map, (<>), ($), (==), (.), Int, Bool(..))
+
 
 -- test readRegister / writeRegister
 test_read_write_Register :: Registers -> Register -> Signed 32 -> Signed 32

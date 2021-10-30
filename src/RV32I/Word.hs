@@ -7,6 +7,8 @@ import Clash.Sized.BitVector ((++#), BitVector)
 import Clash.Promoted.Nat.Literals as Nat
 import Clash.XException (NFDataX)
 import GHC.Generics (Generic)
+import Prelude (($), Show, Eq, Enum)
+
 
 -- WordX is represents X bit that will intepreted as unsined.
 newtype Word32 = Word32 (Signed 32) deriving (Show, Eq, Generic, NFDataX)

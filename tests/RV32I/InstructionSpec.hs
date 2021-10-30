@@ -5,6 +5,8 @@ import TestUtils.Common
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck as QC
+import Prelude (map, (<>), ($), (==), (.), Bool(..))
+
 
 -- encode/decode from/to Instruction/Word32 will be satisfied identification
 decode_encode_instruction :: [Instruction] -> Bool

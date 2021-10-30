@@ -11,6 +11,7 @@ import Clash.Class.BitPack (pack, unpack)
 import Clash.Promoted.Nat.Literals as Nat
 import Clash.XException (NFDataX)
 import GHC.Generics (Generic)
+import Prelude (($))
 
 -- This DSL convert raw opecode to human readable RV32I instruction.
 

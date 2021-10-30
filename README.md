@@ -97,3 +97,12 @@ or, you can use `runCPU'` helper function.
 [`sample`](https://hackage.haskell.org/package/clash-prelude-0.99.3/docs/Clash-Signal-Internal.html#v:sample) function generates infinite list of result of CPU execution, and `addImm` code will loop by jumping same addresss, so you take some length from this.
 
 You can see the 'fibonacci program' in [src/RV32I/Programs/Fib.hs](./src/RV32I/Programs/Fib.hs) as a more complex example.  
+
+## Clash
+
+In this repository, we use Clash version `1.4.5` and can check its version as follows
+
+```bash
+stack run -- clash --version
+Clash, version 1.4.5 (using clash-lib, version: 1.4.5)
+```

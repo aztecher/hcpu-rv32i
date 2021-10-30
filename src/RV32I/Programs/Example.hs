@@ -10,6 +10,7 @@ import RV32I.Instruction
 import RV32I.Word
 import RV32I.Format
 import RV32I.Register
+import Prelude (($))
 
 -- Test ADDI/ADD/JAL
 -- addImm :: Vec 4 Instruction

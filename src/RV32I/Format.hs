@@ -4,6 +4,8 @@ import RV32I.Register
 import RV32I.Word
 import Clash.XException (NFDataX)
 import GHC.Generics (Generic)
+import Prelude (Show, Eq, Enum)
+
 
 -- Opcode
 -- [ R | I | S | B | U | J ](Opcode name for distinguishing format)

@@ -3,6 +3,7 @@ module RV32I.Register where
 import Clash.Sized.BitVector (BitVector)
 import Clash.XException (NFDataX)
 import GHC.Generics (Generic)
+import Prelude (Show, Eq, Enum)
 
 data Register
   = Zero -- constant value : 0
