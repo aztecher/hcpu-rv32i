@@ -73,6 +73,7 @@ However, some instruction sets, s.t. FENCE, FENCEI, ... are not implemented yet.
 * [x] Refactor Codes
 * [x] Consider relation between `Vec n Instruction` and address space
 * [x] Create fibonacci function and check it's execution
+* [x] Compile to Verilog-HDL
 * [ ] Check working on compiled Verilog-HDL
 * [ ] Check working on FPGA
 
@@ -106,3 +107,26 @@ In this repository, we use Clash version `1.4.5` and can check its version as fo
 stack run -- clash --version
 Clash, version 1.4.5 (using clash-lib, version: 1.4.5)
 ```
+
+## Known Issue
+
+Take too much time to compile this program.
+In my local computer, total compilation time is about 9h!
+
+```bash
+cabal run clash -- RV32I.Top --verilog
+Up to date
+Loaded package environment from /Users/mikiyaf/Documents/haskell/Clash/hcpu-rv32i/.ghc.environment.x86_64-darwin-8.10.7
+GHC: Parsing and optimising modules took: 8.366s
+GHC: Loading external modules from interface files took: 0.008s
+GHC: Parsing annotations took: 0.010s
+Clash: Parsing and compiling primitives took 0.176s
+GHC+Clash: Loading modules cumulatively took 13.695s
+Clash: Compiling RV32I.Top.topEntity
+Clash: Normalization took 8h57m46.924s
+Clash: Netlist generation took 2m0.349s
+Clash: Total compilation took 9h0m3.538s
+```
+
+and generaed code is total 70000+ LoC located in `verilog/RV32I.Top.topEntity/topEntity.v`.
+

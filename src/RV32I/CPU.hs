@@ -11,30 +11,31 @@ import Clash.Signal
   (Signal, System, HiddenClockResetEnable, register, sample, exposeClockResetEnable)
 import Clash.Sized.BitVector (BitVector, Bit, (++#), size#)
 import Clash.Sized.Internal.BitVector
-  (and#, or#, xor#, toInteger#, fromInteger#, shiftL#, shiftR#, index#,
-   msb#, replaceBit#, lt#, gt#, ge#, complement#, neq#)
+  (and#, or#, xor#, toInteger#, shiftL#, shiftR#, index#,
+   msb#, replaceBit#, lt#, gt#, ge#, complement#, negate#, neq#)
 import Clash.Sized.Vector (Vec((:>), Nil), (!!), (++), repeat )
 import Clash.Sized.Signed (Signed)
+import Clash.Sized.Internal.Signed (fromInteger#)
 import Clash.Sized.Unsigned (Unsigned)
 import Clash.Class.BitPack (pack, unpack)
 import Clash.Class.Resize (resize)
+import Clash.Promoted.Nat (snatProxy)
 import Clash.Promoted.Nat.Literals as Nat
 import Clash.XException (NFDataX)
+import Data.Proxy
 import GHC.Generics (Generic)
 import Prelude
-  (($), (+), (-), (*), (==), (<), (.),
+  (($), (+), (-), (*), (**), (==), (<), (.),
    undefined, take, fmap, otherwise, fromIntegral,
-   Show, Eq, IO, Int, Bool(..))
+   Show, Eq, IO, Int, Bool(..), Float)
 import GHC.Stack (HasCallStack)
 import GHC.TypeLits
-
 
 -- CPU State
 data CPUActivity
   = LoadingInstruction
   | IncrementProgramCounter
   | ExecutingInstruction Instruction deriving (Show, Generic, NFDataX)
-  -- -- | Halted
 
 data CPUState = CPUState CPUActivity Registers deriving (Show, Generic, NFDataX)
 
@@ -497,15 +498,64 @@ cycle (CPUState activity registers, ram) = case activity of
     -- For IncrementProgramCounter
     registers' = registers {pc = increment (pc registers)}
 
-replaceFromMsr :: BitVector 32 -> Int -> Bit -> BitVector 32
-replaceFromMsr bv shift bit = loop bv size shift bit
-  where
-    size = (size# bv) - 1
-    loop :: BitVector 32 -> Int -> Int -> Bit -> BitVector 32
-    loop bv index shift bit
-      | index == (size - shift) = bv
-      | otherwise               = loop (replaceBit# bv index bit) (index - 1) shift bit
 
+replaceFromMsr :: BitVector 32 -> Int -> Bit -> BitVector 32
+replaceFromMsr bv shift bit = case bit of
+  (1 :: Bit) -> let mask = fetchBitMaskFromMsr shift bit
+                in bv `or#` mask
+  (0 :: Bit) -> let mask = fetchBitMaskFromMsr shift bit
+                in bv `and#` mask
+
+-- mkBit :: forall n . (KnownNat n, (n <=? 32) ~ 'True, (0 <=? n) ~ 'True)
+--   => n
+--   -> BitVector (32 - n)
+-- mkBit from = slice from' to' source
+--   where
+--     from'  = snatProxy (Proxy :: Proxy 31)
+--     to'    = snatProxy (Proxy :: Proxy from)
+--     source = 0 :: BitVector 32
+
+-- Hardcoded because the BitVector length is at mos 32.
+fetchBitMaskFromMsr :: Int -> Bit -> BitVector 32
+fetchBitMaskFromMsr num bit = case bit of
+  (1 :: Bit) -> mask
+  (0 :: Bit) -> xor# mask (-1 :: BitVector 32)
+  where
+    mask = case num of
+      0 -> 0 :: BitVector 32
+      1 -> 2147483648 :: BitVector 32
+      2 -> 3221225472 :: BitVector 32
+      3 -> 3758096384 :: BitVector 32
+      4 -> 4026531840 :: BitVector 32
+      5 -> 4160749568 :: BitVector 32
+      6 -> 4227858432 :: BitVector 32
+      7 -> 4261412864 :: BitVector 32
+      8 -> 4278190080 :: BitVector 32
+      9 -> 4286578688 :: BitVector 32
+      10 -> 4290772992 :: BitVector 32
+      11 -> 4292870144 :: BitVector 32
+      12 -> 4293918720 :: BitVector 32
+      13 -> 4294443008 :: BitVector 32
+      14 -> 4294705152 :: BitVector 32
+      15 -> 4294836224 :: BitVector 32
+      16 -> 4294901760 :: BitVector 32
+      17 -> 4294934528 :: BitVector 32
+      18 -> 4294950912 :: BitVector 32
+      19 -> 4294959104 :: BitVector 32
+      20 -> 4294963200 :: BitVector 32
+      21 -> 4294965248 :: BitVector 32
+      22 -> 4294966272 :: BitVector 32
+      23 -> 4294966784 :: BitVector 32
+      24 -> 4294967040 :: BitVector 32
+      25 -> 4294967168 :: BitVector 32
+      26 -> 4294967232 :: BitVector 32
+      27 -> 4294967264 :: BitVector 32
+      28 -> 4294967280 :: BitVector 32
+      29 -> 4294967288 :: BitVector 32
+      30 -> 4294967292 :: BitVector 32
+      31 -> 4294967294 :: BitVector 32
+      32 -> 4294967295 :: BitVector 32
+      _ -> undefined
 
 cpuHardware :: (HiddenClockResetEnable dom) => CPUState -> RAM -> Signal dom Registers
 cpuHardware initialCPUState initialRAM = resultSignal

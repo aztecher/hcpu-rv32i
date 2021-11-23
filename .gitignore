@@ -40,5 +40,4 @@ cabal.config
 
 # HDL directories often created during development cycle
 /vhdl
-/verilog
 /systemverilog
