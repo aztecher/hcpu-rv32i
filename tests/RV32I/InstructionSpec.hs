@@ -15,4 +15,4 @@ decode_encode_instruction xs = map (decodeInstruction . encodeInstruction) xs ==
 spec :: Spec
 spec = do
   describe (propTag <> "decodeInstruction . encodeInstruction") $ do
-    prop "check decode / encode Instruction identity property" $ decode_encode_instruction
+    prop "check decode / encode Instruction identity property" decode_encode_instruction
