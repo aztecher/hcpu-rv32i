@@ -128,5 +128,5 @@ Clash: Netlist generation took 2m0.349s
 Clash: Total compilation took 9h0m3.538s
 ```
 
-and generaed code is total 70000+ LoC located in `verilog/RV32I.Top.topEntity/topEntity.v`.
+and generaed code is total 70000+ LoC verilog file.
 
